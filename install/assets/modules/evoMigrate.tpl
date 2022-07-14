@@ -17,8 +17,8 @@ echo "Migrating!<br />";
 
 
 /* USER MIGRATION */
-$rs = $modx->db->select( "username", $modx->getFullTableName('manager_users') );
-while ( $row= $modx->db->getRow($rs)) {
+$rsUsers = $modx->db->select( "username", $modx->getFullTableName('manager_users') );
+while ( $row= $modx->db->getRow($rsUsers) ) {
     $usernames[] = $row['username'];
 }
 
@@ -77,10 +77,10 @@ echo "Migrating Managers to Users<br />";
 /* MIGRATING MANAGERS TO USERS */
 
 // Get the manager users
-$rs = $modx->db->select( "*", $modx->getFullTableName('manager_users') );
+$rsUsers = $modx->db->select( "*", $modx->getFullTableName('manager_users') );
 file_put_contents($base_dir.'/assets/cache/users.txt', "old_user_id||new_user_id\n", FILE_APPEND);
 
-while ( $user = $modx->db->getRow($rs) ) {
+while ( $user = $modx->db->getRow($rsUsers) ) {
 	$userAttributes = array();
 	$userSettings = array();
 	$userMemberGroup = array();
@@ -201,6 +201,8 @@ while ( $user = $modx->db->getRow($rs) ) {
 	
 	
 }
+
+//die("how many users!");
 
 $rs = $modx->db->query("SHOW TABLES LIKE '".$modx->db->config['table_prefix']."permissions';");
 $count = $modx->db->getRecordCount($rs);
@@ -553,17 +555,6 @@ if ($count == 0) {
 
 /* Install new system files */
 
-$lang_array = ['ukrainian' => 'uk',
-    'svenska' => 'sv', 'svenska-utf8' => 'sv', 'spanish' => 'es', 'spanish-utf8' => 'es', 'simple_chinese-gb2312' => 'zh', 'simple_chinese-gb2312-utf8' => 'zh',
-    'russian' => 'ru', 'russian-UTF8' => 'ru', 'portuguese' => 'pt', 'portuguese-br' => 'pt-br', 'portuguese-br-utf8' => 'pt-br',
-    'polish' => 'pl', 'polish-utf8' => 'pl', 'persian' => 'fa', 'norsk' => 'no', 'nederlands' => 'nl', 'nederlands-utf8' => 'nl',
-    'japanese-utf8' => 'ja', 'italian' => 'it', 'hebrew' => 'he', 'german' => 'de', 'francais' => 'fr', 'francais-utf8' => 'fr',
-    'finnish' => 'fi', 'english' => 'en', 'english-british' => 'en', 'danish' => 'da', 'czech' => 'cs', 'chinese' => 'zh', 'bulgarian' => 'bz'];
-chdir('../');
-$base_dir = getcwd();
-
-echo $base_dir();
-
 
 $temp_dir = $base_dir . '/_temp' . md5(time());
     $config_2_dir = $base_dir . '/core/config/database/connections/default.php';
@@ -689,6 +680,7 @@ class EvoInstaller
             return '';
         }
         $config_file_1_4 = $base_dir . '/manager/includes/config.inc.php';
+		echo $config_file_1_4."<br />";
         if (!file_exists($config_file_1_4)) {
             echo 'config file not exists';
             exit();
