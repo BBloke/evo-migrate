@@ -464,22 +464,7 @@ if ( $count == 0 ) {
     $fields = ['migration' => '2018_06_29_182342_create_role_permissions_table', 'batch' => 1];
 	$modx->db->insert($fields,  $modx->db->config['table_prefix']."migrations_install" );
 	
-	
-    //$result = \EvolutionCMS\Models\UserRole::get()->toArray();
-	
-	/* RESULTS */
-	/*
-	Array ( 
-			[0] => Array ( [id] => 1 [name] => Administrator [description] => Site administrators have full access to all functions [manage_metatags] => 0 [edit_doc_metatags] => 0 ) 
-			[1] => Array ( [id] => 2 [name] => PowerUser [description] => Generic User Role [manage_metatags] => 0 [edit_doc_metatags] => 1 ) 
-			[2] => Array ( [id] => 3 [name] => Quality [description] => Manage and Edit Quality Documents [manage_metatags] => 0 [edit_doc_metatags] => 0 ) 
-			[3] => Array ( [id] => 4 [name] => Customer [description] => To be used when setting an account to customer [manage_metatags] => 0 [edit_doc_metatags] => 0 ) 
-			[4] => Array ( [id] => 5 [name] => NewAdmins [description] => [manage_metatags] => 0 [edit_doc_metatags] => 0 ) )
-	*/
-	/* END RESULTS */
-	
-	
-	$sql = " SELECT * FROM `".$modx->db->config['table_prefix']."user_roles`;";
+	$sql = " SELECT * FROM `". $modx->db->config['table_prefix']."user_roles`;";
 	$rs = $modx->db->query($sql);
 	while ( $row = $modx->db->getRow($rs) ) {
 		$result[] = $row;
@@ -563,8 +548,7 @@ if ($count == 0) {
 }
 
 
-file_put_contents($base_dir . '/core/.install', time());
-unlink(__FILE__);
+
 /* END SYSTEM EVENTS */
 
 /* Install new system files */
@@ -621,6 +605,9 @@ $temp_dir = $base_dir . '/_temp' . md5(time());
     if (file_exists($base_dir . '/core/storage/bootstrap/siteCache.idx.php')) {
         unlink($base_dir . '/core/storage/bootstrap/siteCache.idx.php');
     }
+
+	file_put_contents($base_dir . '/core/.install', time());
+	unlink(__FILE__);
 /* END INSTALL NEW SYSTEM FILES */
 
 
