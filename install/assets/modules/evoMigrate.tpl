@@ -708,8 +708,8 @@ class EvoInstaller
         $arr_config['[+connection_charset+]'] = $parameters['charset'];
         $arr_config['[+connection_collation+]'] = $database_connection_charset_;
         $arr_config['[+table_prefix+]'] = $parameters['table_prefix'];
-        $arr_config['[+connection_method+]'] = $database_connection_method;
-        $arr_config['[+database_engine+]'] = $database_engine;
+        $arr_config['[+connection_method+]'] = $parameters['database_connection_method'];
+        $arr_config['[+database_engine+]'] = $parameters['database_engine'];
 		
         $str = "<?php
 return [
