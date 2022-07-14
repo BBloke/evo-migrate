@@ -678,7 +678,7 @@ class EvoInstaller
 
     static public function checkConfig($base_dir, $config_2_dir, $database_engine, $parameters)
     {
-		
+	if ($parameters['host'] == '127.0.0.1') $parameters['host'] = 'localhost';
         if (file_exists($config_2_dir)) {
             return '';
         }
@@ -723,9 +723,9 @@ return [
     'charset' => env('DB_CHARSET', '[+connection_charset+]'), 
     'collation' => env('DB_COLLATION', '[+connection_collation+]'),
     'prefix' => env('DB_PREFIX', '[+table_prefix+]'),
-    'method' => env('DB_METHOD', '[+connection_method+]'), 
+    'method' => env('DB_METHOD', 'SET CHARACTER SET'), 
     'strict' => env('DB_STRICT', false),
-    'engine' => env('DB_ENGINE', [+database_engine+]),
+    'engine' => env('DB_ENGINE'),
     'options' => [
         PDO::ATTR_STRINGIFY_FETCHES => true,
     ]
