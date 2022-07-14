@@ -11,6 +11,8 @@ $lang_array = ['ukrainian' => 'uk',
 chdir('../');
 $base_dir = getcwd();
 
+echo $base_dir."<br />";
+
 echo "Migrating!<br />";
 
 
@@ -78,13 +80,13 @@ echo "Migrating Managers to Users<br />";
 $rs = $modx->db->select( "*", $modx->getFullTableName('manager_users') );
 file_put_contents($base_dir.'/assets/cache/users.txt', "old_user_id||new_user_id\n", FILE_APPEND);
 
-while ( $row = $modx->db->getRow($rs) ) {
+while ( $user = $modx->db->getRow($rs) ) {
 	$userAttributes = array();
 	$userSettings = array();
 	$userMemberGroup = array();
 	
-	echo $row['id']."<br />";
-	$oldId = $row['id'];
+	echo $user['id']."<br />";
+	$oldId = $user['id'];
 	
 	// User attributes
 	$rsUser = $modx->db->select( "*", $modx->getFullTableName('user_attributes'), "id=".$oldId );
@@ -110,10 +112,10 @@ while ( $row = $modx->db->getRow($rs) ) {
 	
 	echo "Creating User!<br />";
 	$newUser = array(
-			"password" => $row['password'],
-			"username" => $row['user']
+			"password" => $user['password'],
+			"username" => $user['user']
 		);
-	$newId = $modx->db->insert($newUser, $modx->getFullTableName('web_user'));	
+	$newId = $modx->db->insert($newUser, $modx->getFullTableName('web_users'));	
 	
 	file_put_contents($base_dir.'/assets/cache/users.txt', $oldId.'||'.$newId."\n", FILE_APPEND);
 	
@@ -144,7 +146,6 @@ while ( $row = $modx->db->getRow($rs) ) {
 		$modx->db->insert($userMemberGroup, $modx->getFullTableName('member_groups') );		
 		$i++;
 	}
-	print_r($userMemberGroup);
 	
 	echo "Moving webgroup_names to membergroupnames";
 	echo "<hr />";
@@ -159,8 +160,6 @@ while ( $row = $modx->db->getRow($rs) ) {
 			$modx->db->insert(array( "name" => $row['name']), $modx->getFullTableName('membergroup_names') );
 		}
 	}
-	
-	print_r($webUserGroups);
 	
 	echo "Moving the old web_groups records to the new member_groups table";
 	echo "<hr />";
