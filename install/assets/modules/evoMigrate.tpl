@@ -600,7 +600,7 @@ if (file_exists($base_dir . '/core/storage/bootstrap/siteCache.idx.php')) {
 file_put_contents($base_dir . '/core/.install', time());
 unlink(__FILE__);
 
-echo "<hr />Please ensure you run the install program as normal. http://{site_url}/install<hr />";
+echo "<hr />Please ensure you run the install program as normal. <a href='http://".$modx->getConfig("site_url")."install'>Complete installation</a><hr />";
 /* END INSTALL NEW SYSTEM FILES */
 
 
@@ -678,6 +678,7 @@ class EvoInstaller
 
     static public function checkConfig($base_dir, $config_2_dir, $database_engine)
     {
+		$modx = evoltuioncms();
         if (file_exists($config_2_dir)) {
             return '';
         }
@@ -709,9 +710,6 @@ class EvoInstaller
         $arr_config['[+table_prefix+]'] = $table_prefix;
         $arr_config['[+connection_method+]'] = $database_connection_method;
         $arr_config['[+database_engine+]'] = $database_engine;
-
-		// Array ( [host] => 127.0.0.1 [dbase] => `dev14` [user] => root [pass] => WB_mysql [charset] => latin1 [connection_method] => SET NAMES [table_prefix] => modx_ ) Stop
-		
 		
         $str = "<?php
 return [
