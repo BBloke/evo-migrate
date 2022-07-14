@@ -557,48 +557,50 @@ if ($count == 0) {
 
 
 $temp_dir = $base_dir . '/_temp' . md5(time());
-    $config_2_dir = $base_dir . '/core/config/database/connections/default.php';
-    $database_engine = 'MyISAM';
+$config_2_dir = $base_dir . '/core/config/database/connections/default.php';
+$database_engine = 'MyISAM';
 
-    EvoInstaller::checkVersion($base_dir);
-    $config = EvoInstaller::checkConfig($base_dir, $config_2_dir, $database_engine);
+EvoInstaller::checkVersion($base_dir);
+$config = EvoInstaller::checkConfig($base_dir, $config_2_dir, $database_engine);
 
 //run unzip and install
-    EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', 'evo.zip');
+EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', 'evo.zip');
 
-    $zip = new ZipArchive;
-    $res = $zip->open($base_dir . '/evo.zip');
-    $zip->extractTo($temp_dir);
-    $zip->close();
-    unlink($base_dir . '/evo.zip');
+$zip = new ZipArchive;
+$res = $zip->open($base_dir . '/evo.zip');
+$zip->extractTo($temp_dir);
+$zip->close();
+unlink($base_dir . '/evo.zip');
 
-    if ($handle = opendir($temp_dir)) {
-        while (false !== ($name = readdir($handle))) {
-            if ($name != '.' && $name != '..') $dir = $name;
-        }
-        closedir($handle);
-    }
+if ($handle = opendir($temp_dir)) {
+	while (false !== ($name = readdir($handle))) {
+		if ($name != '.' && $name != '..') $dir = $name;
+	}
+	closedir($handle);
+}
 
-    EvoInstaller::rmdirs($base_dir . '/manager');
-    EvoInstaller::rmdirs($base_dir . '/vendor');
-    if (file_exists($base_dir . '/assets/cache/siteManager.php')) {
-        unlink($base_dir . '/assets/cache/siteManager.php');
-    }
-    EvoInstaller::moveFiles($temp_dir . '/' . $dir, $base_dir . '/');
-    if ($config != '') {
-        file_put_contents($config_2_dir, $config);
-    }
-    EvoInstaller::rmdirs($temp_dir);
-    if (file_exists($base_dir . '/assets/cache/siteCache.idx.php')){
+EvoInstaller::rmdirs($base_dir . '/manager');
+EvoInstaller::rmdirs($base_dir . '/vendor');
+if (file_exists($base_dir . '/assets/cache/siteManager.php')) {
+	unlink($base_dir . '/assets/cache/siteManager.php');
+}
+EvoInstaller::moveFiles($temp_dir . '/' . $dir, $base_dir . '/');
+if ($config != '') {
+	file_put_contents($config_2_dir, $config);
+}
+EvoInstaller::rmdirs($temp_dir);
+if (file_exists($base_dir . '/assets/cache/siteCache.idx.php')){
 
-        unlink($base_dir . '/assets/cache/siteCache.idx.php');
-    }
-    if (file_exists($base_dir . '/core/storage/bootstrap/siteCache.idx.php')) {
-        unlink($base_dir . '/core/storage/bootstrap/siteCache.idx.php');
-    }
+	unlink($base_dir . '/assets/cache/siteCache.idx.php');
+}
+if (file_exists($base_dir . '/core/storage/bootstrap/siteCache.idx.php')) {
+	unlink($base_dir . '/core/storage/bootstrap/siteCache.idx.php');
+}
 
-	file_put_contents($base_dir . '/core/.install', time());
-	unlink(__FILE__);
+file_put_contents($base_dir . '/core/.install', time());
+unlink(__FILE__);
+
+echo "<hr />Please ensure you run the install program as normal. http://{site_url}/install<hr />";
 /* END INSTALL NEW SYSTEM FILES */
 
 
