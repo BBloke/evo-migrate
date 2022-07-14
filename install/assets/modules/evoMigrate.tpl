@@ -13,6 +13,7 @@ $base_dir = getcwd();
 
 echo "Migrating!<br />";
 
+
 /* USER MIGRATION */
 $rs = $modx->db->select( "username", $modx->getFullTableName('manager_users') );
 while ( $row= $modx->db->getRow($rs)) {
@@ -67,19 +68,97 @@ if ($checkUsername > 0 || $checkEmail > 0) {
     }
     exit();
 }
-die("stop!");
 
 
+echo "Migrating Managers to Users<br />";
 
+/* MIGRATING MANAGERS TO USERS */
 
-
-$users = \DB::table('manager_users')->get();
+// Get the manager users
+$rs = $modx->db->select( "*", $modx->getFullTableName('manager_users') );
 file_put_contents($base_dir.'/assets/cache/users.txt', "old_user_id||new_user_id\n", FILE_APPEND);
 
-$oldidnewid = [];
+while ( $row = $modx->db->getRow($rs) ) {
+	$userAttributes = array();
+	$userSettings = array();
+	$userMemberGroup = array();
+	
+	echo $row['id']."<br />";
+	$oldId = $row['id'];
+	
+	// User attributes
+	$rsUser = $modx->db->select( "*", $modx->getFullTableName('user_attributes'), "id=".$oldId );
+	$userAttributes = $modx->db->getRow($rsUser);
+	unset($userAttributes['id']); // We don't need this but we do need to create it for the newly inserted user record
+	
+	// Manager Settings
+	$rsUserSettings = $modx->db->select( "*", $modx->getFullTableName('user_settings'), "user=".$oldId );
+	while ( $row = $modx->db->getRow($rsUserSettings) ) {
+		unset($row['user']); // remove the user id
+		$userSettings[] = $row;
+	}
+	
+	echo "<hr />";
+	
+	// Member Groups
+	$rsMemberGroup = $modx->db->select( "*", $modx->getFullTableName('member_groups'), "user=".$oldId );
+	while ( $row = $modx->db->getRow($rsMemberGroup) ) {
+		$userMemberGroup[] = $row;
+	}
+	
+	echo "<hr />";
+	
+	echo "Creating User!<br />";
+	$newUser = array(
+			"password" => $row['password'],
+			"username" => $row['user']
+		);
+	//$newId = $modx->db->insert($newUser, $modx->getFullTableName('web_user'));	
+	
+	file_put_contents($base_dir.'/assets/cache/users.txt', $oldId.'||'.$newId."\n", FILE_APPEND);
+	
+	echo "Migrating User Attributes<br />";
+	echo "Set Attributes to New ID<br/>";
+	$userAttributes['internalKey'] = $newId;
+	
+	//$modx->db->insert($userAttributes, $modx->getFullTableName('web_user_attributes') );
+	
+	echo "Migrating User Settings<br />";
+	echo "Set Settings to New ID<br/>";
+	
+	$i=0;
+	while ($i < count($userSettings) ) {
+		$userSettings[$i]['webuser'] = $newId;
+		//$modx->db->insert($userSettings, $modx->getFullTableName('web_user_settings') );
+		$i++;
+	}
+	
+	echo "Migrating Member Groups<br />";
+	echo "Normally manager users are not a part of web user groups - There should be nothing to do here!";
+	$i=0;
+	while ($i < count($userMemberGroup) ) {
+		$userMemberGroup[$i]['member'] = $newId;
+		//$modx->db->insert($userMemberGroup, $modx->getFullTableName('member_groups') );		
+		$i++;
+	}
+	print_r($userMemberGroup);
+	
+	echo "deleting the old manager user<br />";
+	//$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
+	//$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
+	//$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
+	
+}
+
+die("stop!");	
+
+//$users = \DB::table('manager_users')->get();
+//file_put_contents($base_dir.'/assets/cache/users.txt', "old_user_id||new_user_id\n", FILE_APPEND);
+
+//$oldidnewid = [];
 
 foreach ($users as $user) {
-
+	/*
     $userArray = (array)$user;
 
     $userAttributes = \DB::table('user_attributes')->where('internalKey', $userArray['id'])->first();
@@ -89,17 +168,17 @@ foreach ($users as $user) {
     } else {
         $userAttributes = [];
     }
-
-    $userSettings = \DB::table('user_settings')->where('user', $userArray['id'])->get();
-    $userMemberGroup = \DB::table('member_groups')->where('member', $userArray['id'])->get();
-    $oldId = $userArray['id'];
-    unset($userArray['id']);
-    unset($userAttributes['id']);
-    $id = \DB::table('web_users')->insertGetId($userArray);
-    $userAttributes['internalKey'] = $id;
-    file_put_contents($base_dir.'/assets/cache/users.txt', $oldId.'||'.$id."\n", FILE_APPEND);
-    $oldidnewid[$oldId] = $id;
-    \DB::table('web_user_attributes')->insert($userAttributes);
+	*/
+    //$userSettings = \DB::table('user_settings')->where('user', $userArray['id'])->get();
+    //$userMemberGroup = \DB::table('member_groups')->where('member', $userArray['id'])->get();
+    //$oldId = $userArray['id'];
+    //unset($userArray['id']);
+    //unset($userAttributes['id']);
+    //$id = \DB::table('web_users')->insertGetId($userArray);
+    //$userAttributes['internalKey'] = $id;
+    //file_put_contents($base_dir.'/assets/cache/users.txt', $oldId.'||'.$id."\n", FILE_APPEND);
+    //$oldidnewid[$oldId] = $id;
+    //\DB::table('web_user_attributes')->insert($userAttributes);
     $arraySetting = [];
     foreach ($userSettings as $setting) {
         $setting = (array)$setting;
