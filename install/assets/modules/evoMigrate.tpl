@@ -113,7 +113,7 @@ while ( $user = $modx->db->getRow($rs) ) {
 	echo "Creating User!<br />";
 	$newUser = array(
 			"password" => $user['password'],
-			"username" => $user['user']
+			"username" => $user['username']
 		);
 	$newId = $modx->db->insert($newUser, $modx->getFullTableName('web_users'));	
 	
@@ -201,8 +201,6 @@ while ( $user = $modx->db->getRow($rs) ) {
 	
 	
 }
-
-//die("stop!");
 
 $rs = $modx->db->query("SHOW TABLES LIKE '".$modx->db->config['table_prefix']."permissions';");
 $count = $modx->db->getRecordCount($rs);
