@@ -707,7 +707,7 @@ class EvoInstaller
         $arr_config['[+password+]'] = $parameters['pass'];
         $arr_config['[+connection_charset+]'] = $parameters['charset'];
         $arr_config['[+connection_collation+]'] = $database_connection_charset_;
-        $arr_config['[+table_prefix+]'] = $table_prefix;
+        $arr_config['[+table_prefix+]'] = $parameters['table_prefix'];
         $arr_config['[+connection_method+]'] = $database_connection_method;
         $arr_config['[+database_engine+]'] = $database_engine;
 		
