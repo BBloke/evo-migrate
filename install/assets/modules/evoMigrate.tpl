@@ -46,7 +46,7 @@ if ($checkUsername > 0 || $checkEmail > 0) {
 				LEFT JOIN dev14.modx_web_users t2 ON t1.username = t2.username
 				having t1.username IN (SELECT t2.username from dev14.modx_web_users);";
 		$rs = $modx->db->query($sql);
-		//$rs = $modx->db->select( "username, id", $modx->getFullTableName('web_users') );
+		
 		while ( $row = $modx->db->getRow($rs)) {
 			echo '<tr><td>' . $row['userid'] . '</td><td>' . $row['username'] . '</td><td>' . $row['webid'] . '</td><td>' . $row['webname'] . '</td></tr>';
 		}
@@ -59,7 +59,7 @@ if ($checkUsername > 0 || $checkEmail > 0) {
 				LEFT JOIN dev14.modx_web_user_attributes t2 ON t1.email = t2.email
 				having t1.email IN (SELECT t2.email FROM dev14.modx_web_user_attributes);";
 		
-		//$rs = $modx->db->select( "username", $modx->getFullTableName('web_user_attributes') );
+		
 		$rs = $modx->db->query($sql);
 		while ( $row= $modx->db->getRow($rs)) {
 			echo '<tr><td>' . $row['internalKey'] . '</td><td>' . $row['email'] . '</td><td>' . $row['webid'] . '</td><td>' . $row['webemail'] . '</td></tr>';
@@ -113,7 +113,7 @@ while ( $row = $modx->db->getRow($rs) ) {
 			"password" => $row['password'],
 			"username" => $row['user']
 		);
-	//$newId = $modx->db->insert($newUser, $modx->getFullTableName('web_user'));	
+	$newId = $modx->db->insert($newUser, $modx->getFullTableName('web_user'));	
 	
 	file_put_contents($base_dir.'/assets/cache/users.txt', $oldId.'||'.$newId."\n", FILE_APPEND);
 	
@@ -121,7 +121,7 @@ while ( $row = $modx->db->getRow($rs) ) {
 	echo "Set Attributes to New ID<br/>";
 	$userAttributes['internalKey'] = $newId;
 	
-	//$modx->db->insert($userAttributes, $modx->getFullTableName('web_user_attributes') );
+	$modx->db->insert($userAttributes, $modx->getFullTableName('web_user_attributes') );
 	
 	echo "Migrating User Settings<br />";
 	echo "Set Settings to New ID<br/>";
@@ -129,7 +129,7 @@ while ( $row = $modx->db->getRow($rs) ) {
 	$i=0;
 	while ($i < count($userSettings) ) {
 		$userSettings[$i]['webuser'] = $newId;
-		//$modx->db->insert($userSettings, $modx->getFullTableName('web_user_settings') );
+		$modx->db->insert($userSettings, $modx->getFullTableName('web_user_settings') );
 		$i++;
 	}
 	
@@ -141,7 +141,7 @@ while ( $row = $modx->db->getRow($rs) ) {
 	$i=0;
 	while ($i < count($userMemberGroup) ) {
 		$userMemberGroup[$i]['member'] = $newId;
-		//$modx->db->insert($userMemberGroup, $modx->getFullTableName('member_groups') );		
+		$modx->db->insert($userMemberGroup, $modx->getFullTableName('member_groups') );		
 		$i++;
 	}
 	print_r($userMemberGroup);
@@ -162,7 +162,7 @@ while ( $row = $modx->db->getRow($rs) ) {
 	
 	print_r($webUserGroups);
 	
-	echo "Moving the old webgroup_access records to the new membergroup_access table";
+	echo "Moving the old web_groups records to the new member_groups table";
 	echo "<hr />";
 	
 	$sql = "INSERT INTO ".$modx->getFullTableName('member_groups')." (user_group, member)
@@ -174,117 +174,36 @@ while ( $row = $modx->db->getRow($rs) ) {
 			INNER JOIN ".$modx->getFullTableName('membergroup_names')." t3 ON t3.name = t2.name;";
 	$rs = $modx->db->query($sql);
 	
+	echo "Moved old web_groups records to the new member_groups table";
+	echo "<hr />";
+	
+	echo "Moving the old webgroup_access records to the new membergroup_access table";
+	echo "<hr />";
+	
+	$sql = "INSERT INTO ".$modx->getFullTableName('member_groups')." (membergroup, documentgroup)
+			SELECT 
+				t3.id as  membergroup,
+				t1.documentgroup as documentgroup
+			FROM ".$modx->getFullTableName('webgroup_access')." t1
+			INNER JOIN ".$modx->getFullTableName('webgroup_names')." t2 ON t1.webgroup = t2.id
+			INNER JOIN ".$modx->getFullTableName('membergroup_names')." t3 ON t3.name = t2.name;";
+	$rs = $modx->db->query($sql);
+	
 	echo "Moved old webgroup_access records to the new membergroup_access table";
 	echo "<hr />";
 	
 	
 	echo "deleting the old manager user<br />";
-	//$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
-	//$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
-	//$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
+	$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
+	$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
+	$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
+	
+	// Drop tables?
 	
 	
-	
 }
 
-die("stop!");	
-
-//$users = \DB::table('manager_users')->get();
-//file_put_contents($base_dir.'/assets/cache/users.txt', "old_user_id||new_user_id\n", FILE_APPEND);
-
-//$oldidnewid = [];
-
-foreach ($users as $user) {
-	/*
-    $userArray = (array)$user;
-
-    $userAttributes = \DB::table('user_attributes')->where('internalKey', $userArray['id'])->first();
-
-    if (!is_null($userAttributes)) {
-        $userAttributes = (array)$userAttributes;
-    } else {
-        $userAttributes = [];
-    }
-	*/
-    //$userSettings = \DB::table('user_settings')->where('user', $userArray['id'])->get();
-    //$userMemberGroup = \DB::table('member_groups')->where('member', $userArray['id'])->get();
-    //$oldId = $userArray['id'];
-    //unset($userArray['id']);
-    //unset($userAttributes['id']);
-    //$id = \DB::table('web_users')->insertGetId($userArray);
-    //$userAttributes['internalKey'] = $id;
-    //file_put_contents($base_dir.'/assets/cache/users.txt', $oldId.'||'.$id."\n", FILE_APPEND);
-    //$oldidnewid[$oldId] = $id;
-    //\DB::table('web_user_attributes')->insert($userAttributes);
-    $arraySetting = [];
-    foreach ($userSettings as $setting) {
-        $setting = (array)$setting;
-        $setting['webuser'] = $id;
-        unset($setting['user']);
-        $arraySetting[] = $setting;
-    }
-    foreach ($userMemberGroup as $group) {
-        $group = (array)$group;
-        $group['member'] = $id;
-        unset($group['id']);
-        \DB::table('member_groups')->insert($group);
-    }
-    \DB::table('member_groups')->where('member', $oldId)->delete();
-
-    \DB::table('web_user_settings')->where('webuser', $oldId)->delete();
-
-    foreach ($arraySetting as $setting)
-        \DB::table('web_user_settings')->insert($setting);
-
-
-}
-
-\DB::table('user_settings')->delete();
-
-$userSettings = \DB::table('web_user_settings')->get();
-foreach ($userSettings as $setting) {
-    $setting = (array)$setting;
-    $setting['user'] = $setting['webuser'];
-    unset($setting['webuser']);
-    \DB::table('user_settings')->insert($setting);
-
-}
-
-$managerGroup = \DB::table('membergroup_names')->pluck('id', 'name')->toArray();
-
-$userGroups = \DB::table('webgroup_names')->pluck('name', 'id')->toArray();
-
-$oldNewGroup = [];
-foreach ($userGroups as $key => $group) {
-    if (isset($managerGroup[$group])) {
-        $oldNewGroup[$key] = $managerGroup[$group];
-    } else {
-        $oldNewGroup[$key] = \DB::table('membergroup_names')->insertGetId(['name' => $group]);
-    }
-}
-$newAccess = [];
-$oldWebGroupAccess = \DB::table('webgroup_access')->get();
-foreach ($oldWebGroupAccess as $access) {
-    $access = (array)$access;
-    $newAccess[] = ['membergroup' => $oldNewGroup[$access['webgroup']], 'documentgroup' => $access['documentgroup']];
-}
-foreach ($newAccess as $access)
-    \DB::table('membergroup_access')->insert($access);
-
-$newWebGroupsUsers = [];
-$oldWebGroupsUsers = \DB::table('web_groups')->get();
-foreach ($oldWebGroupsUsers as $user) {
-    $user = (array)$user;
-    $newWebGroupsUsers[] = ['user_group' => $oldNewGroup[$user['webgroup']], 'member' => $oldidnewid[$user['webuser']]];
-}
-foreach ($newWebGroupsUsers as $user) {
-    \DB::table('member_groups')->insert($user);
-}
-/* END USER MIGRATION */
-
-
-
-die("Stopping before we have dealt with doing the users");
+//die("stop!");
 
 $rs = $modx->db->query("SHOW TABLES LIKE '".$modx->db->config['table_prefix']."permissions';");
 $count = $modx->db->getRecordCount($rs);
@@ -663,7 +582,7 @@ chdir('../');
 $base_dir = getcwd();
 
 echo $base_dir();
-/*
+
 
 $temp_dir = $base_dir . '/_temp' . md5(time());
     $config_2_dir = $base_dir . '/core/config/database/connections/default.php';
@@ -705,7 +624,6 @@ $temp_dir = $base_dir . '/_temp' . md5(time());
     if (file_exists($base_dir . '/core/storage/bootstrap/siteCache.idx.php')) {
         unlink($base_dir . '/core/storage/bootstrap/siteCache.idx.php');
     }
-*/
 /* END INSTALL NEW SYSTEM FILES */
 
 
