@@ -682,12 +682,12 @@ class EvoInstaller
             return '';
         }
         $config_file_1_4 = $base_dir . '/manager/includes/config.inc.php';
-		echo $config_file_1_4."<br />";
+		
         if (!file_exists($config_file_1_4)) {
             echo 'config file not exists';
             exit();
         }
-        include $config_file_1_4;
+        //include $config_file_1_4;
         $database_connection_charset_ = 'utf8_general_ci';
         if ($database_connection_charset == 'utf8') {
             $database_connection_charset_ = 'utf8_general_ci';
@@ -699,20 +699,23 @@ class EvoInstaller
             $database_connection_charset_ = 'cp1251_general_ci';
         }
         $arr_config['[+database_type+]'] = 'mysql';
-        $arr_config['[+database_server+]'] = $database_server;
+        $arr_config['[+database_server+]'] = $modx->db->config['host'];
         $arr_config['[+database_port+]'] = 3306;
-        $arr_config['[+dbase+]'] = str_replace('`', '', $dbase);
-        $arr_config['[+user_name+]'] = $database_user;
-        $arr_config['[+password+]'] = $database_password;
-        $arr_config['[+connection_charset+]'] = $database_connection_charset;
+        $arr_config['[+dbase+]'] = str_replace('`', '', $modx->db->config['dbase']);
+        $arr_config['[+user_name+]'] = $modx->db->config['user'];
+        $arr_config['[+password+]'] = $modx->db->config['pass'];
+        $arr_config['[+connection_charset+]'] = $modx->db->config['charset'];
         $arr_config['[+connection_collation+]'] = $database_connection_charset_;
         $arr_config['[+table_prefix+]'] = $table_prefix;
         $arr_config['[+connection_method+]'] = $database_connection_method;
         $arr_config['[+database_engine+]'] = $database_engine;
 
+		// Array ( [host] => 127.0.0.1 [dbase] => `dev14` [user] => root [pass] => WB_mysql [charset] => latin1 [connection_method] => SET NAMES [table_prefix] => modx_ ) Stop
+		
+		
         $str = "<?php
 return [
-    'driver' => env('DB_TYPE', '[+database_type+]'), 
+    'driver' => env('DB_TYPE', 'mysqli'), 
     'host' => env('DB_HOST', '[+database_server+]'), 
     'port' => env('DB_PORT', '[+database_port+]'), 
     'database' => env('DB_DATABASE', '[+dbase+]'), 
@@ -724,7 +727,7 @@ return [
     'prefix' => env('DB_PREFIX', '[+table_prefix+]'),
     'method' => env('DB_METHOD', '[+connection_method+]'), 
     'strict' => env('DB_STRICT', false),
-    'engine' => env('DB_ENGINE', '[+database_engine+]'),
+    'engine' => env('DB_ENGINE', [+database_engine+]),
     'options' => [
         PDO::ATTR_STRINGIFY_FETCHES => true,
     ]
