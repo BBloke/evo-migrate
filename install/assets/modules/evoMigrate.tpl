@@ -359,7 +359,7 @@ if ( $count == 0 ) {
 
     ];
 	foreach ($insertArray as $record) {
-		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
 	}
 	
     $insertArray = [
@@ -376,7 +376,7 @@ if ( $count == 0 ) {
 
     ];
     foreach ($insertArray as $record) {
-		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
 	}
     
 	$insertArray = [
@@ -399,7 +399,7 @@ if ( $count == 0 ) {
         ['name' => 'Delete Templates', 'key' => 'delete_template', 'lang_key' => 'role_delete_template', 'disabled' => 0, 'group_id' => 6],
     ];
     foreach ($insertArray as $record) {
-		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
 	}
 
     $insertArray = [
@@ -428,7 +428,7 @@ if ( $count == 0 ) {
 
     ];
     foreach ($insertArray as $record) {
-		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
 	}
 
     $insertArray = [
@@ -448,7 +448,7 @@ if ( $count == 0 ) {
 
     ];
     foreach ($insertArray as $record) {
-		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
 	}
 	
 	echo "Created permissions!<br />";
@@ -559,14 +559,9 @@ if ($count == 0) {
 		);
 	$modx->db->insert( $fields, $modx->db->config['table_prefix']."system_eventnames" );
 }
-
-
-
 /* END SYSTEM EVENTS */
 
 /* Install new system files */
-
-
 $temp_dir = $base_dir . '/_temp' . md5(time());
 $config_2_dir = $base_dir . '/core/config/database/connections/default.php';
 $database_engine = 'MyISAM';
