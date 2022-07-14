@@ -1,3 +1,4 @@
+<?php
 $count = 0;
 $checkUsername = 0;
 $checkEmail = 0;
@@ -356,8 +357,10 @@ if ( $count == 0 ) {
         ['name' => 'Change password', 'lang_key' => 'role_change_password', 'key' => 'change_password', 'disabled' => 0, 'group_id' => 1],
         ['name' => 'Save password', 'lang_key' => 'role_save_password', 'key' => 'save_password', 'disabled' => 0, 'group_id' => 1],
 
-    ];    
-	$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+    ];
+	foreach ($insertArray as $record) {
+		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+	}
 	
     $insertArray = [
         ['name' => 'View a Resource\'s data', 'key' => 'view_document', 'lang_key' => 'role_view_docdata', 'disabled' => 1, 'group_id' => 2],
@@ -372,7 +375,9 @@ if ( $count == 0 ) {
         ['name' => 'View Unpublished Resources', 'key' => 'view_unpublished', 'lang_key' => 'role_view_unpublished', 'disabled' => 0, 'group_id' => 2],
 
     ];
-    $modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+    foreach ($insertArray as $record) {
+		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+	}
     
 	$insertArray = [
         ['name' => 'Use the file manager (full root access)', 'key' => 'file_manager', 'lang_key' => 'role_file_manager', 'disabled' => 0, 'group_id' => 3],
@@ -393,7 +398,9 @@ if ( $count == 0 ) {
         ['name' => 'Save Templates', 'key' => 'save_template', 'lang_key' => 'role_save_template', 'disabled' => 0, 'group_id' => 6],
         ['name' => 'Delete Templates', 'key' => 'delete_template', 'lang_key' => 'role_delete_template', 'disabled' => 0, 'group_id' => 6],
     ];
-    $modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+    foreach ($insertArray as $record) {
+		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+	}
 
     $insertArray = [
         ['name' => 'Create new Snippets', 'key' => 'new_snippet', 'lang_key' => 'role_create_snippet', 'disabled' => 0, 'group_id' => 7],
@@ -420,7 +427,9 @@ if ( $count == 0 ) {
         ['name' => 'Web access permissions', 'key' => 'web_access_permissions', 'lang_key' => 'role_web_access_persmissions', 'disabled' => 0, 'group_id' => 11],
 
     ];
-    $modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+    foreach ($insertArray as $record) {
+		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+	}
 
     $insertArray = [
         ['name' => 'Create new roles', 'key' => 'new_role', 'lang_key' => 'role_new_role', 'disabled' => 0, 'group_id' => 12],
@@ -438,7 +447,9 @@ if ( $count == 0 ) {
         ['name' => 'Display Locks', 'key' => 'display_locks', 'lang_key' => 'role_display_locks', 'disabled' => 0, 'group_id' => 14],
 
     ];
-    $modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+    foreach ($insertArray as $record) {
+		$modx->db->insert($insertArray, $modx->db->config['table_prefix']."permissions");
+	}
 	
 	echo "Created permissions!<br />";
 }
