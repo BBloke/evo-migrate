@@ -564,7 +564,8 @@ EvoInstaller::checkVersion($base_dir);
 $config = EvoInstaller::checkConfig($base_dir, $config_2_dir, $database_engine, $modx->db->config);
 
 //run unzip and install
-EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', 'evo.zip');
+//EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', 'evo.zip');
+EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/tags/3.1.11.zip', 'evo.zip');
 
 $zip = new ZipArchive;
 $res = $zip->open($base_dir . '/evo.zip');
