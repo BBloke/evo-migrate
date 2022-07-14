@@ -715,7 +715,7 @@ class EvoInstaller
 		
         $str = "<?php
 return [
-    'driver' => env('DB_TYPE', 'mysqli'), 
+    'driver' => env('DB_TYPE', '[+database_type+]'), 
     'host' => env('DB_HOST', '[+database_server+]'), 
     'port' => env('DB_PORT', '[+database_port+]'), 
     'database' => env('DB_DATABASE', '[+dbase+]'), 
