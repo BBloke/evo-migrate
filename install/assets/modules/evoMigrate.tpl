@@ -359,7 +359,8 @@ if ( $count == 0 ) {
 
     ];
 	foreach ($insertArray as $record) {
-		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		$insertid = $modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		if (empty($insertid)) echo "insert failed!";
 	}
 	
     $insertArray = [
@@ -376,7 +377,8 @@ if ( $count == 0 ) {
 
     ];
     foreach ($insertArray as $record) {
-		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		$insertid = $modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		if (empty($insertid)) echo "insert failed!";
 	}
     
 	$insertArray = [
@@ -399,7 +401,8 @@ if ( $count == 0 ) {
         ['name' => 'Delete Templates', 'key' => 'delete_template', 'lang_key' => 'role_delete_template', 'disabled' => 0, 'group_id' => 6],
     ];
     foreach ($insertArray as $record) {
-		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		$insertid = $modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		if (empty($insertid)) echo "insert failed!";
 	}
 
     $insertArray = [
@@ -428,7 +431,8 @@ if ( $count == 0 ) {
 
     ];
     foreach ($insertArray as $record) {
-		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		$insertid = $modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		if (empty($insertid)) echo "insert failed!";
 	}
 
     $insertArray = [
@@ -448,7 +452,8 @@ if ( $count == 0 ) {
 
     ];
     foreach ($insertArray as $record) {
-		$modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		$insertid = $modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
+		if (empty($insertid)) echo "insert failed!";
 	}
 	
 	echo "Created permissions!<br />";
