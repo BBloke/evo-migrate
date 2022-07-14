@@ -564,8 +564,7 @@ EvoInstaller::checkVersion($base_dir);
 $config = EvoInstaller::checkConfig($base_dir, $config_2_dir, $database_engine, $modx->db->config);
 
 //run unzip and install
-//EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', 'evo.zip');
-EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/tags/3.1.11.zip', 'evo.zip');
+EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', 'evo.zip');
 
 $zip = new ZipArchive;
 $res = $zip->open($base_dir . '/evo.zip');
@@ -601,7 +600,7 @@ if (file_exists($base_dir . '/core/storage/bootstrap/siteCache.idx.php')) {
 file_put_contents($base_dir . '/core/.install', time());
 unlink(__FILE__);
 
-echo "<hr />Please ensure you run the install program as normal. http://{site_url}/install to Complete the installation<hr />";
+echo "<hr />Please ensure you run the install program as normal. <a href='http://".$modx->getConfig("site_url")."install'>Complete installation</a><hr />";
 /* END INSTALL NEW SYSTEM FILES */
 
 
@@ -710,7 +709,7 @@ class EvoInstaller
         $arr_config['[+connection_collation+]'] = $database_connection_charset_;
         $arr_config['[+table_prefix+]'] = $parameters['table_prefix'];
         $arr_config['[+connection_method+]'] = $parameters['database_connection_method'];
-        $arr_config['[+database_engine+]'] = $parameters['database_engine'];
+        $arr_config['[+database_engine+]'] = $database_engine;
 		
         $str = "<?php
 return [
@@ -726,7 +725,7 @@ return [
     'prefix' => env('DB_PREFIX', '[+table_prefix+]'),
     'method' => env('DB_METHOD', 'SET CHARACTER SET'), 
     'strict' => env('DB_STRICT', false),
-    'engine' => env('DB_ENGINE'),
+    'engine' => env('DB_ENGINE', '[+database_engine+]'),
     'options' => [
         PDO::ATTR_STRINGIFY_FETCHES => true,
     ]
