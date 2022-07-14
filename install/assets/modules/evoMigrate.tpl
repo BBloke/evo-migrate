@@ -561,7 +561,7 @@ $config_2_dir = $base_dir . '/core/config/database/connections/default.php';
 $database_engine = 'MyISAM';
 
 EvoInstaller::checkVersion($base_dir);
-$config = EvoInstaller::checkConfig($base_dir, $config_2_dir, $database_engine);
+$config = EvoInstaller::checkConfig($base_dir, $config_2_dir, $database_engine, $modx->db->config);
 
 //run unzip and install
 EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', 'evo.zip');
@@ -676,9 +676,9 @@ class EvoInstaller
         }
     }
 
-    static public function checkConfig($base_dir, $config_2_dir, $database_engine)
+    static public function checkConfig($base_dir, $config_2_dir, $database_engine, $parameters)
     {
-		$modx = evoltuioncms();
+		
         if (file_exists($config_2_dir)) {
             return '';
         }
@@ -700,12 +700,12 @@ class EvoInstaller
             $database_connection_charset_ = 'cp1251_general_ci';
         }
         $arr_config['[+database_type+]'] = 'mysql';
-        $arr_config['[+database_server+]'] = $modx->db->config['host'];
+        $arr_config['[+database_server+]'] = $parameters['host'];
         $arr_config['[+database_port+]'] = 3306;
-        $arr_config['[+dbase+]'] = str_replace('`', '', $modx->db->config['dbase']);
-        $arr_config['[+user_name+]'] = $modx->db->config['user'];
-        $arr_config['[+password+]'] = $modx->db->config['pass'];
-        $arr_config['[+connection_charset+]'] = $modx->db->config['charset'];
+        $arr_config['[+dbase+]'] = str_replace('`', '', $parameters['dbase']);
+        $arr_config['[+user_name+]'] = $parameters['user'];
+        $arr_config['[+password+]'] = $parameters['pass'];
+        $arr_config['[+connection_charset+]'] = $parameters['charset'];
         $arr_config['[+connection_collation+]'] = $database_connection_charset_;
         $arr_config['[+table_prefix+]'] = $table_prefix;
         $arr_config['[+connection_method+]'] = $database_connection_method;
