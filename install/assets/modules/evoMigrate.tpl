@@ -101,7 +101,7 @@ while ( $row = $modx->db->getRow($rs) ) {
 	echo "<hr />";
 	
 	// Member Groups
-	$rsMemberGroup = $modx->db->select( "*", $modx->getFullTableName('member_groups'), "user=".$oldId );
+	$rsMemberGroup = $modx->db->select( "*", $modx->getFullTableName('member_groups'), "member=".$oldId );
 	while ( $row = $modx->db->getRow($rsMemberGroup) ) {
 		$userMemberGroup[] = $row;
 	}
@@ -134,7 +134,10 @@ while ( $row = $modx->db->getRow($rs) ) {
 	}
 	
 	echo "Migrating Member Groups<br />";
+	echo "This will update the old admin id's with the new user id for any connected groups";
+	echo "<hr />";
 	echo "Normally manager users are not a part of web user groups - There should be nothing to do here!";
+	echo "<hr />";
 	$i=0;
 	while ($i < count($userMemberGroup) ) {
 		$userMemberGroup[$i]['member'] = $newId;
@@ -143,10 +146,44 @@ while ( $row = $modx->db->getRow($rs) ) {
 	}
 	print_r($userMemberGroup);
 	
+	echo "Moving webgroup_names to membergroupnames";
+	echo "<hr />";
+	$rsWebGroups = $modx->db->select("name", $modx->getFullTableName('webgroup_names'), "", "id DESC" );
+	while ( $row = $modx->db->getRow($rsWebGroups) ) {
+		echo "Checking for duplicate group: ".$row['name']."<br />";
+		
+		$rsGroupDuplicate = $modx->db->select( "name", $modx->getFullTableName('membergroup_names'), "name='".$row['name']."'", "id ASC");
+		if ( $modx->db->getRecordCount($rsGroupDuplicate) > 0 ) {
+			echo "duplicate found!<br />";
+		} else {
+			$modx->db->insert(array( "name" => $row['name']), $modx->getFullTableName('membergroup_names') );
+		}
+	}
+	
+	print_r($webUserGroups);
+	
+	echo "Moving the old webgroup_access records to the new membergroup_access table";
+	echo "<hr />";
+	
+	$sql = "INSERT INTO ".$modx->getFullTableName('member_groups')." (user_group, member)
+			SELECT 
+				t3.id as  user_group,
+				t1.webuser as member
+			FROM ".$modx->getFullTableName('web_groups')." t1
+			INNER JOIN ".$modx->getFullTableName('webgroup_names')." t2 ON t1.webgroup = t2.id
+			INNER JOIN ".$modx->getFullTableName('membergroup_names')." t3 ON t3.name = t2.name;";
+	$rs = $modx->db->query($sql);
+	
+	echo "Moved old webgroup_access records to the new membergroup_access table";
+	echo "<hr />";
+	
+	
 	echo "deleting the old manager user<br />";
 	//$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
 	//$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
 	//$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
+	
+	
 	
 }
 
