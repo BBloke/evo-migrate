@@ -53,9 +53,10 @@ if ($checkUsername > 0 || $checkEmail > 0) {
 		echo '<table border="1"><thead><th>Manager Id</th><th>Manager username</th><th>Web User Id</th><th>Web user username</th></thead><tbody></tbody>';
 
 		// We go through web user
-		$sql = "SELECT t1.id as userid, t1.username as username, t2.id as webid, t2.username as webname FROM dev14.modx_manager_users t1 
-				LEFT JOIN dev14.modx_web_users t2 ON t1.username = t2.username
-				having t1.username IN (SELECT t2.username from dev14.modx_web_users);";
+		$sql = "SELECT t1.id as userid, t1.username as username, t2.id as webid, t2.username as webname 
+				FROM ".$modx->getFullTableName('manager_users')." t1 
+				LEFT JOIN ".$modx->getFullTableName('web_users')." t2 ON t1.username = t2.username
+				having t1.username IN (SELECT t2.username from ".$modx->getFullTableName('web_users').");";
 		$rs = $modx->db->query($sql);
 		
 		while ( $row = $modx->db->getRow($rs)) {
@@ -66,9 +67,11 @@ if ($checkUsername > 0 || $checkEmail > 0) {
 	
     if ($checkEmail > 0) {    
         echo '<table border="1"> <thead><th>Manager Id</th><th>Manager email</th><th>Web User Id</th><th>Web user email</th></thead><tbody></tbody>';
-		$sql = "SELECT t1.internalKey as userid, t1.email as email, t2.internalKey as webid, t2.email as webemail FROM dev14.modx_user_attributes  t1 
-				LEFT JOIN dev14.modx_web_user_attributes t2 ON t1.email = t2.email
-				having t1.email IN (SELECT t2.email FROM dev14.modx_web_user_attributes);";
+		
+		$sql = "SELECT t1.internalKey as userid, t1.email as email, t2.internalKey as webid, t2.email as webemail 
+				FROM ".$modx->getFullTableName('modx_user_attributes')."  t1 
+				LEFT JOIN ".$modx->getFullTableName('web_user_attributes')." t2 ON t1.email = t2.email
+				HAVING t1.email IN (SELECT t2.email FROM ".$modx->getFullTableName('web_user_attributes')." );";
 		
 		
 		$rs = $modx->db->query($sql);
