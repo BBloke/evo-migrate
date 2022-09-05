@@ -618,9 +618,10 @@ if (file_exists($base_dir . '/core/storage/bootstrap/siteCache.idx.php')) {
 }
 
 file_put_contents($base_dir . '/core/.install', time());
-unlink(__FILE__);
+// Do not delete the module file.
+//unlink(__FILE__);
 
-echo "<hr />Please ensure you run the install program as normal. <a href='http://".$modx->getConfig("site_url")."install'>Complete installation</a><hr />";
+echo "<hr />Please ensure you run the install program as normal. <a target='_new' href='".$modx->getConfig("site_url")."install'>Complete installation</a><hr />";
 /* END INSTALL NEW SYSTEM FILES */
 
 
