@@ -209,39 +209,41 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
 	$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
 	
-	// DROP TABLES
-	$dropTables = array (
-					"manager_user",
-					"user_settings",
-					"user_attributes"
-					);
-					
-	foreach ( $dropTables as $table ) {
-		$sql = "DROP TABLE ".$modx->getFullTableName($table).";";
-		$modx->db->query($sql);
-		echo "DROPPING Table ".$table."<br />";
-	}
 	
-	// Rename existing web tables to new names
-	/*
-	web_user_attributes > user_attributes
-	web_users > users
-	web_user_settings > user_settings	
-	*/
-	$tableRenames = array(
-						"web_user_attributes" => "user_attributes",
-						"web_users" => "users",
-						"web_user_settings" => "user_settings"
-					);
-					
-	foreach ( $tableRenames as $key => $value ) {
-		$sql = "ALTER TABLE ".$modx->getFullTableName($key)." RENAME TO ".$modx->getFullTableName($value).";";
-		$modx->db->query($sql);
-		echo "Renaming Table ".$key." To ".$value."<br />";
-	}
-	
-	echo "Renamed all relevant tables!<br />";
 }
+
+// DROP TABLES
+$dropTables = array (
+				"manager_user",
+				"user_settings",
+				"user_attributes"
+				);
+				
+foreach ( $dropTables as $table ) {
+	$sql = "DROP TABLE ".$modx->getFullTableName($table).";";
+	//$modx->db->query($sql);
+	echo "DROPPING Table ".$table."<br />";
+}
+
+// Rename existing web tables to new names
+/*
+web_user_attributes > user_attributes
+web_users > users
+web_user_settings > user_settings	
+*/
+$tableRenames = array(
+					"web_user_attributes" => "user_attributes",
+					"web_users" => "users",
+					"web_user_settings" => "user_settings"
+				);
+				
+foreach ( $tableRenames as $key => $value ) {
+	$sql = "ALTER TABLE ".$modx->getFullTableName($key)." RENAME TO ".$modx->getFullTableName($value).";";
+	//$modx->db->query($sql);
+	echo "Renaming Table ".$key." To ".$value."<br />";
+}
+
+echo "Renamed all relevant tables!<br />";
 
 //die("how many users!");
 
@@ -655,7 +657,7 @@ file_put_contents($base_dir . '/core/.install', time());
 
 echo "<hr />Please ensure you run the install program as normal. <a target='_new' href='".$modx->getConfig("site_url")."install'>Complete installation</a><hr />";
 /* END INSTALL NEW SYSTEM FILES */
-
+die();
 
 class EvoInstaller
 {
