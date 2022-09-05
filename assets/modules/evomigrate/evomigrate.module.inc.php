@@ -156,7 +156,7 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 		$i++;
 	}
 	
-	echo "Moving webgroup_names to membergroupnames";
+	echo "Moving webgroup_names to membergroup_names";
 	echo "<hr />";
 	$rsWebGroups = $modx->db->select("name", $modx->getFullTableName('webgroup_names'), "", "id DESC" );
 	while ( $row = $modx->db->getRow($rsWebGroups) ) {
@@ -578,6 +578,7 @@ if ($count == 0) {
 $temp_dir = $base_dir . '/_temp' . md5(time());
 $config_2_dir = $base_dir . '/core/config/database/connections/default.php';
 $database_engine = 'MyISAM';
+$database_engine = 'InnoDB';
 
 EvoInstaller::checkVersion($base_dir);
 $config = EvoInstaller::checkConfig($base_dir, $config_2_dir, $database_engine, $modx->db->config);
@@ -697,6 +698,8 @@ class EvoInstaller
 
     static public function checkConfig($base_dir, $config_2_dir, $database_engine, $parameters)
     {
+	// convert charset to utf8
+	$parameters['charset'] = 'utf8';
 	if ($parameters['host'] == '127.0.0.1') $parameters['host'] = 'localhost';
         if (file_exists($config_2_dir)) {
             return '';
