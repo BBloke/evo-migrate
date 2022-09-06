@@ -23,6 +23,10 @@ Alternatively you can disable them via phpMyAdmin.
 
 My testing was using an old Evo v1.0 site that has been updated during the years.  I duplicated the site and exported the database to a new table. I spent some time altering the schema charset and tables.  This may have been beneficial to the migraton process but as yet, i'm not sure.  More testing is needed with old databases and character sets!
 
+Extra Note:
+The character set for the config file has been fixed to "UTF8".  Something I need to test with different database setups.
+The DB Engine is also fixed in the config file to "InnoDB".
+
 Disclaimer:
 This module is offered as-is.  Please make sure you take suitable precautions before running the migration.
 Backup up your site files and database first.

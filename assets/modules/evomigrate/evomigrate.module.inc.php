@@ -212,43 +212,6 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	
 }
 
-// DROP TABLES
-$dropTables = array (
-				"manager_user",
-				"user_settings",
-				"user_attributes"
-				);
-				
-foreach ( $dropTables as $table ) {
-	$sql = "DROP TABLE ".$modx->getFullTableName($table).";";
-	//$modx->db->query($sql);
-	echo "DROPPING Table ".$table."<br />";
-}
-
-// Rename existing web tables to new names
-/*
-web_user_attributes > user_attributes
-web_users > users
-web_user_settings > user_settings	
-*/
-$tableRenames = array(
-					"web_user_attributes" => "user_attributes",
-					"web_users" => "users",
-					"web_user_settings" => "user_settings"
-				);
-				
-foreach ( $tableRenames as $key => $value ) {
-	$sql = "ALTER TABLE ".$modx->getFullTableName($key)." RENAME TO ".$modx->getFullTableName($value).";";
-	//$modx->db->query($sql);
-	echo "Renaming Table ".$key." To ".$value."<br />";
-}
-
-echo "Renamed all relevant tables!<br />";
-
-//die("how many users!");
-
-
-
 //////////////////////////
 ////////////////////////
 /////////////////////////
@@ -457,11 +420,10 @@ if ( $count == 0 ) {
         ['name' => 'Change site settings', 'key' => 'settings', 'lang_key' => 'role_edit_settings', 'disabled' => 0, 'group_id' => 14],
         ['name' => 'Use the Backup Manager', 'key' => 'bk_manager', 'lang_key' => 'role_bk_manager', 'disabled' => 0, 'group_id' => 14],
         ['name' => 'Remove Locks', 'key' => 'remove_locks', 'lang_key' => 'role_remove_locks', 'disabled' => 0, 'group_id' => 14],
-        ['name' => 'Display Locks', 'key' => 'display_locks', 'lang_key' => 'role_display_locks', 'disabled' => 0, 'group_id' => 14],
+        ['name' => 'Display Locks', 'key' => 'display_locks', 'lang_key' => 'role_display_locks', 'disabled' => 0, 'group_id' => 14]
     ];
     foreach ($insertArray as $record) {
 		$insert = $modx->db->insert($record, $modx->db->config['table_prefix']."permissions");
-		echo $insert." ".$record['name']."<br />";
 	}
 	
 	echo "<hr />Created permissions!<br />";
@@ -578,8 +540,6 @@ if ($count == 0) {
 /* END SYSTEM EVENTS */
 
 /* Install new system files */
-
-
 $temp_dir = $base_dir . '/_temp' . md5(time());
 $config_2_dir = $base_dir . '/core/config/database/connections/default.php';
 $database_engine = 'MyISAM';
