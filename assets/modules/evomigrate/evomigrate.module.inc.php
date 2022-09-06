@@ -143,7 +143,7 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	$i=0;
 	while ($i < count($userSettings) ) {
 		$userSettings[$i]['webuser'] = $newId;
-		$modx->db->insert($userSettings, $modx->getFullTableName('web_user_settings') );
+		$modx->db->insert($userSettings[$i], $modx->getFullTableName('web_user_settings') );
 		$i++;
 	}
 	
@@ -155,7 +155,7 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	$i=0;
 	while ($i < count($userMemberGroup) ) {
 		$userMemberGroup[$i]['member'] = $newId;
-		$modx->db->insert($userMemberGroup, $modx->getFullTableName('member_groups') );		
+		$modx->db->insert($userMemberGroup[$i], $modx->getFullTableName('member_groups') );		
 		$i++;
 	}
 	
