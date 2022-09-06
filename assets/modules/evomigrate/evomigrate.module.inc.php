@@ -212,8 +212,9 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	
 }
 
+
 //////////////////////////
-////////////////////////
+/////////////////////////
 /////////////////////////
 
 /* MIGRATION INSTALL */
@@ -664,8 +665,7 @@ class EvoInstaller
 
     static public function checkConfig($base_dir, $config_2_dir, $database_engine, $parameters)
     {
-	// convert charset to utf8
-	$parameters['charset'] = 'utf8';
+	
 	if ($parameters['host'] == '127.0.0.1') $parameters['host'] = 'localhost';
         if (file_exists($config_2_dir)) {
             return '';
@@ -676,17 +676,24 @@ class EvoInstaller
             echo 'config file not exists';
             exit();
         }
-        //include $config_file_1_4;
-        $database_connection_charset_ = 'utf8_general_ci';
-        if ($database_connection_charset == 'utf8') {
-            $database_connection_charset_ = 'utf8_general_ci';
-        }
-        if ($database_connection_charset == 'utf8mb4') {
-            $database_connection_charset_ = 'utf8mb4_general_ci';
-        }
-        if ($database_connection_charset == 'cp1251') {
-            $database_connection_charset_ = 'cp1251_general_ci';
-        }
+        
+		//include $config_file_1_4;
+        echo $parameters['charset'];
+		switch ( $parameters['charset'] ) {
+			case "utf8":
+				$database_connection_charset_ = 'utf8_general_ci';
+				break;
+			case "utf8mb4":
+				$database_connection_charset_ = 'utf8mb4_general_ci';
+				break;
+			case "cp1251":
+				$database_connection_charset_ = 'cp1251_general_ci';
+				break;
+			default:
+				$database_connection_charset_ = 'latin1_swedish_ci';
+				break;
+		}
+
         $arr_config['[+database_type+]'] = 'mysql';
         $arr_config['[+database_server+]'] = $parameters['host'];
         $arr_config['[+database_port+]'] = 3306;
@@ -696,7 +703,7 @@ class EvoInstaller
         $arr_config['[+connection_charset+]'] = $parameters['charset'];
         $arr_config['[+connection_collation+]'] = $database_connection_charset_;
         $arr_config['[+table_prefix+]'] = $parameters['table_prefix'];
-        $arr_config['[+connection_method+]'] = $parameters['database_connection_method'];
+        $arr_config['[+connection_method+]'] = $parameters['connection_method'];
         $arr_config['[+database_engine+]'] = $database_engine;
 		
         $str = "<?php
