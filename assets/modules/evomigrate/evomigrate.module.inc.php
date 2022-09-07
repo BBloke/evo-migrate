@@ -1,7 +1,4 @@
 <?php
-	// Author: BBloke
-	// Date 5-9-22
-	// v0
 $count = 0;
 $checkUsername = 0;
 $checkEmail = 0;
