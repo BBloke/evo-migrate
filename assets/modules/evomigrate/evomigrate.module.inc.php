@@ -6,6 +6,9 @@ $count = 0;
 $checkUsername = 0;
 $checkEmail = 0;
 
+$action_id = isset($_GET['a']) 		? intval($_GET['a']) 	: 0;
+$module_id = isset($_GET['id']) 	? intval($_GET['id']) 	: 0;
+
 $lang_array = ['ukrainian' => 'uk',
     'svenska' => 'sv', 'svenska-utf8' => 'sv', 'spanish' => 'es', 'spanish-utf8' => 'es', 'simple_chinese-gb2312' => 'zh', 'simple_chinese-gb2312-utf8' => 'zh',
     'russian' => 'ru', 'russian-UTF8' => 'ru', 'portuguese' => 'pt', 'portuguese-br' => 'pt-br', 'portuguese-br-utf8' => 'pt-br',
@@ -14,6 +17,23 @@ $lang_array = ['ukrainian' => 'uk',
     'finnish' => 'fi', 'english' => 'en', 'english-british' => 'en', 'danish' => 'da', 'czech' => 'cs', 'chinese' => 'zh', 'bulgarian' => 'bz'];
 chdir('../');
 $base_dir = getcwd();
+
+if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
+	die("You are already on v3 or above.");
+}
+
+if ( empty($_REQUEST['action']) ) {
+	// If we haven't said run don't do anything.
+	echo "Please ensure you backup your files and database before proceeding.<br />";
+	echo "<form>";
+	//echo "<a href='#&action=run' title='run' class='btn'>Run</a>";
+	echo '<input type="hidden" name="a" value="'.$action_id.'"/>';
+    echo '<input type="hidden" name="id" value="'.$module_id.'"/>';
+	echo "<input type='submit' name='action' value='Run' class='btn'>";
+	echo "</form>";
+	die();
+}
+
 
 echo $base_dir."<br />";
 
