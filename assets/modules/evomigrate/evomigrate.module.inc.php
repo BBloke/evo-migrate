@@ -86,7 +86,7 @@ if ($checkUsername > 0 || $checkEmail > 0) {
         echo '<table border="1"> <thead><th>Manager Id</th><th>Manager email</th><th>Web User Id</th><th>Web user email</th></thead><tbody></tbody>';
 		
 		$sql = "SELECT t1.internalKey as userid, t1.email as email, t2.internalKey as webid, t2.email as webemail 
-				FROM ".$modx->getFullTableName('modx_user_attributes')."  t1 
+				FROM ".$modx->getFullTableName('user_attributes')."  t1 
 				LEFT JOIN ".$modx->getFullTableName('web_user_attributes')." t2 ON t1.email = t2.email
 				HAVING t1.email IN (SELECT t2.email FROM ".$modx->getFullTableName('web_user_attributes')." );";
 		
