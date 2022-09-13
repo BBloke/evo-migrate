@@ -13,8 +13,8 @@ The program does the following:
 7. Creates role_permissions table
 8. Adds in required system events
 9. Creates config file
-10. Downloads and installs the new v3 program
-11. You must then run install after migration
+10. Downloads the new v3 program from evolution/evolution-community
+11. Run /install to finalise the migration.
 
 # Issues:
 Plugins can prevent you from accessing your site after the migration.  This may be due to the plugins code trying to use the old web user tables.
