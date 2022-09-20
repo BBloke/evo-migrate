@@ -216,14 +216,16 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 			INNER JOIN ".$modx->getFullTableName('webgroup_names')." t2 ON t1.webgroup = t2.id
 			INNER JOIN ".$modx->getFullTableName('membergroup_names')." t3 ON t3.name = t2.name;";
 	*/
+	/*
+	//Removed as this will not put the records in for the 'web' user. It would only do it for the mgr user
 	$sql = "INSERT INTO ".$modx->getFullTableName('membergroup_access')."  (membergroup, documentgroup)
 			SELECT 
 				t1.id as membergroup,
 				t1.documentgroup
 			FROM ".$modx->getFullTableName('webgroup_access')." t1;";
 	$rs = $modx->db->query($sql);
-	
-	echo "Moved old webgroup_access records to the new membergroup_access table";
+	*/
+	//echo "Moved old webgroup_access records to the new membergroup_access table";
 	echo "<hr />";
 	
 	
