@@ -213,7 +213,7 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	echo "deleting the old manager user<br />";
 	$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
 	$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
-	$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
+	//$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
 }
 
 
