@@ -3,8 +3,12 @@ $count = 0;
 $checkUsername = 0;
 $checkEmail = 0;
 
+$_REQUEST['action'] ??= '';
+
 $action_id = isset($_GET['a']) 		? intval($_GET['a']) 	: 0;
 $module_id = isset($_GET['id']) 	? intval($_GET['id']) 	: 0;
+
+$tempWebGroupAccess = 'tempwebgroup_access';
 
 $lang_array = ['ukrainian' => 'uk',
     'svenska' => 'sv', 'svenska-utf8' => 'sv', 'spanish' => 'es', 'spanish-utf8' => 'es', 'simple_chinese-gb2312' => 'zh', 'simple_chinese-gb2312-utf8' => 'zh',
@@ -16,6 +20,27 @@ chdir('../');
 $base_dir = getcwd();
 
 if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
+	
+	if ( $_REQUEST['action'] == 'Import' ) {
+		// Append records from temp table to actual table.
+		$sql = "INSERT INTO ".$modx->getFullTableName('membergroup_access')." (membergroup, documentgroup, context)  
+				SELECT webgroup, documentgroup, '1' FROM ".$modx->getFullTableName($tempWebGroupAccess).";";
+		$modx->db->query($sql);
+		echo "Imported old webgroup_access table";
+		
+		$sql = "DROP TABLE ".$modx->getFullTableName($tempWebGroupAccess).";";
+		$modx->db->query($sql);
+		echo "Removed temporary table";
+		
+	} else {
+		echo "Do you want to import the old webgroup_access table in the current usergroup_access table.";
+		echo "<form>";
+		//echo "<a href='#&action=run' title='run' class='btn'>Run</a>";
+		echo '<input type="hidden" name="a" value="'.$action_id.'"/>';
+		echo '<input type="hidden" name="id" value="'.$module_id.'"/>';
+		echo "<input type='submit' name='action' value='Import' class='btn'>";
+		echo "</form>";
+	}
 	die("You are already on v3 or above.");
 }
 
@@ -28,6 +53,18 @@ if ( empty($_REQUEST['action']) ) {
     echo '<input type="hidden" name="id" value="'.$module_id.'"/>';
 	echo "<input type='submit' name='action' value='Run' class='btn'>";
 	echo "</form>";
+	
+	$rs = $modx->db->query('SHOW TABLES LIKE "%'.$tempWebGroupAccess.'%"');
+	$count = $modx->db->getRecordCount($rs);
+
+	// Content Database
+	if ( $count==0 ) {
+		// We should move webgroup_access to a temp table so we can import it later after the migration.
+		$sql = "CREATE TABLE ".$modx->getFullTableName($tempWebGroupAccess)." AS SELECT * FROM ".$modx->getFullTableName('webgroup_access').";";
+		$rs = $modx->db->query($sql);
+		echo "Created temporary webgroup_access table for migration after the installation of v3";
+	}	
+	
 	die();
 }
 
@@ -86,7 +123,7 @@ if ($checkUsername > 0 || $checkEmail > 0) {
         echo '<table border="1"> <thead><th>Manager Id</th><th>Manager email</th><th>Web User Id</th><th>Web user email</th></thead><tbody></tbody>';
 		
 		$sql = "SELECT t1.internalKey as userid, t1.email as email, t2.internalKey as webid, t2.email as webemail 
-				FROM ".$modx->getFullTableName('user_attributes')."  t1 
+				FROM ".$modx->getFullTableName('modx_user_attributes')."  t1 
 				LEFT JOIN ".$modx->getFullTableName('web_user_attributes')." t2 ON t1.email = t2.email
 				HAVING t1.email IN (SELECT t2.email FROM ".$modx->getFullTableName('web_user_attributes')." );";
 		
@@ -207,13 +244,24 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	
 	echo "Moving the old webgroup_access records to the new membergroup_access table";
 	echo "<hr />";
+	
+	$sql = "INSERT INTO ".$modx->getFullTableName('member_groups')." (membergroup, documentgroup)
+			SELECT 
+				t3.id as  membergroup,
+				t1.documentgroup as documentgroup
+			FROM ".$modx->getFullTableName('webgroup_access')." t1
+			INNER JOIN ".$modx->getFullTableName('webgroup_names')." t2 ON t1.webgroup = t2.id
+			INNER JOIN ".$modx->getFullTableName('membergroup_names')." t3 ON t3.name = t2.name;";
+	$rs = $modx->db->query($sql);
+	
+	echo "Moved old webgroup_access records to the new membergroup_access table";
 	echo "<hr />";
 	
 	
 	echo "deleting the old manager user<br />";
 	$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
 	$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
-	//$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
+	$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
 }
 
 
