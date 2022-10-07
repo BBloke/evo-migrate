@@ -26,14 +26,14 @@ if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
 		$sql = "INSERT INTO ".$modx->getFullTableName('membergroup_access')." (membergroup, documentgroup, context)  
 				SELECT webgroup, documentgroup, '1' FROM ".$modx->getFullTableName($tempWebGroupAccess).";";
 		$modx->db->query($sql);
-		echo "Imported old webgroup_access table";
+		echo "Imported old webgroup_access table. <br />";
 		
 		$sql = "DROP TABLE ".$modx->getFullTableName($tempWebGroupAccess).";";
 		$modx->db->query($sql);
-		echo "Removed temporary table";
+		echo "Removed temporary table.<br />";
 		
 	} else {
-		echo "Do you want to import the old webgroup_access table in the current usergroup_access table.";
+		echo "Do you want to import the old webgroup_access table in the current usergroup_access table.<br />";
 		echo "<form>";
 		//echo "<a href='#&action=run' title='run' class='btn'>Run</a>";
 		echo '<input type="hidden" name="a" value="'.$action_id.'"/>';
@@ -60,7 +60,15 @@ if ( empty($_REQUEST['action']) ) {
 	// Content Database
 	if ( $count==0 ) {
 		// We should move webgroup_access to a temp table so we can import it later after the migration.
-		$sql = "CREATE TABLE ".$modx->getFullTableName($tempWebGroupAccess)." AS SELECT * FROM ".$modx->getFullTableName('webgroup_access').";";
+		$sql = 'CREATE TABLE '.$modx->getFullTableName($tempWebGroupAccess).' AS 
+				SELECT 
+					t3.id as webgroup,
+					documentgroup,
+					"1"
+				FROM '.$modx->getFullTableName('webgroup_access').' t1
+				INNER JOIN '.$modx->getFullTableName('webgroup_names').' t2 ON t1.webgroup = t2.id
+				INNER JOIN '.$modx->getFullTableName('membergroup_names').' t3 ON t2.name = t3.name;';
+		
 		$rs = $modx->db->query($sql);
 		echo "Created temporary webgroup_access table for migration after the installation of v3";
 	}	
