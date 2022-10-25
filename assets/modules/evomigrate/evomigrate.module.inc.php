@@ -29,7 +29,7 @@ if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
 		echo "Imported old webgroup_access table. <br />";
 		
 		$sql = "DROP TABLE ".$modx->getFullTableName($tempWebGroupAccess).";";
-		$modx->db->query($sql);
+		//$modx->db->query($sql);
 		echo "Removed temporary table.<br />";
 		
 	} else {
@@ -47,6 +47,7 @@ if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
 if ( empty($_REQUEST['action']) ) {
 	// If we haven't said run don't do anything.
 	echo "Please ensure you backup your files and database before proceeding.<br />";
+	echo "This program will attempt to migrate you webusers and groups to v3<br />";
 	echo "<form>";
 	//echo "<a href='#&action=run' title='run' class='btn'>Run</a>";
 	echo '<input type="hidden" name="a" value="'.$action_id.'"/>';
@@ -54,11 +55,37 @@ if ( empty($_REQUEST['action']) ) {
 	echo "<input type='submit' name='action' value='Run' class='btn'>";
 	echo "</form>";
 	
+	echo "The below output is a precursor to the migration.<br />";
+	echo "1. Run this module - it will automatically create some necessary details. <br/>";
+	echo "2. Click 'Run' when available - NB: Only click it once.  IT will do what is needed without the screen updating.<br />";
+	echo "3. Complete the installation by running install/index.php to update to v3.<br />";
+	echo "4. Re-run this module to import the original user/group permissions.<br />";
+	
+	// We are going to create membergroup_names to match the webuser_names
+	echo "Moving webgroup_names to membergroup_names";
+	echo "<hr />";
+	$rsWebGroups = $modx->db->select("name", $modx->getFullTableName('webgroup_names'), "", "id DESC" );
+	while ( $row = $modx->db->getRow($rsWebGroups) ) {
+		echo "Checking for duplicate group: ".$row['name'];
+		
+		$rsGroupDuplicate = $modx->db->select( "name", $modx->getFullTableName('membergroup_names'), "name='".$row['name']."'", "id ASC");
+		if ( $modx->db->getRecordCount($rsGroupDuplicate) > 0 ) {
+			echo " <srtong>duplicate found!</strong><br />";
+		} else {
+			$modx->db->insert(array( "name" => $row['name']), $modx->getFullTableName('membergroup_names') );
+		}
+		echo "<br />";
+	}
+	
+	echo "Moving the old web_groups records to the new member_groups table";
+	echo "<hr />";
+	
+	
 	$rs = $modx->db->query('SHOW TABLES LIKE "%'.$tempWebGroupAccess.'%"');
 	$count = $modx->db->getRecordCount($rs);
 
 	// Content Database
-	if ( $count==0 ) {
+	if ( $count == 0 ) {
 		// We should move webgroup_access to a temp table so we can import it later after the migration.
 		$sql = 'CREATE TABLE '.$modx->getFullTableName($tempWebGroupAccess).' AS 
 				SELECT 
@@ -271,7 +298,6 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
 	$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
 }
-
 
 //////////////////////////
 /////////////////////////
