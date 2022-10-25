@@ -1,20 +1,22 @@
-# evo-migrate
+# evo-migrate v1.0.9 
 EvolutionCMS module for migrating v1.4, v2 to v3.x
 Works with PHP 7 and PHP 8
 
 The program does the following:
 
-1. Checks admin user names against current web user names for duplicates
-2. Checks admin email addresses against current web email addresses for duplicates
-3. Reports any findings that need addressing
-4. Transfers any settings and permissions
-5. Creates migration_install table for logs
-6. Creates permissions table
-7. Creates role_permissions table
-8. Adds in required system events
-9. Creates config file
-10. Downloads the new v3 program from evolution/evolution-community
-11. Run /install to finalise the migration.
+1. Creates new manager group names from web group names
+2. Creates a table to import after v3 installation to migrate the new webuser > user group permissions in point 1.
+3. Checks admin user names against current web user names for duplicates
+4. Checks admin email addresses against current web email addresses for duplicates
+5. Reports any findings that need addressing
+6. Transfers any settings and permissions
+7. Creates migration_install table for logs
+8. Creates permissions table
+9. Creates role_permissions table
+10. Adds in required system events
+11. Creates config file
+12. Downloads the new v3 program from evolution/evolution-community
+13. Run /install to finalise the migration.
 
 # Issues:
 Plugins can prevent you from accessing your site after the migration.  This may be due to the plugins code trying to use the old web user tables.
