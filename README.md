@@ -40,6 +40,18 @@ You will also need to change any FormLister call for user login, regristration e
 &model=`Pathologic\EvolutionCMS\MODxAPI\modUsers`
 ```
 
+You will also need to add Pathologic's composer package to core/custom/composer.json
+
+** Exmaple
+```
+{
+
+	"require": {
+		"pathologic/modxapi": "*"
+	}
+}
+```
+
 The script makes a backup of webgroup_access table so it can be imported after v3 installation.
 Re-run the migration script after v3 installation will offer a button to import.
 This puts your old webuser/document resource links.
