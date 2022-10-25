@@ -29,7 +29,7 @@ if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
 		echo "Imported old webgroup_access table. <br />";
 		
 		$sql = "DROP TABLE ".$modx->getFullTableName($tempWebGroupAccess).";";
-		//$modx->db->query($sql);
+		$modx->db->query($sql);
 		echo "Removed temporary table.<br />";
 		
 	} else {
