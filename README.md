@@ -18,6 +18,11 @@ The program does the following:
 12. Downloads the new v3 program from evolution/evolution-community
 13. Run /install to finalise the migration.
 
+# To-Do:
+Test migration of a website that does NOT have users/permissions.
+
+At the moment the script will fail if there are no users/permissions setup.  I'm hoping to deal with this eventuality soon.
+
 # Issues:
 Plugins can prevent you from accessing your site after the migration.  This may be due to the plugins code trying to use the old web user tables.
 The best approach I have found is to disable all the plugins prior to migrating.  Re-enabling them one by one and test the site after migration.
