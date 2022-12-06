@@ -1,4 +1,7 @@
 <?php
+// bbloke/evo-migrate v2
+// Trying to utilise ajax
+
 $count = 0;
 $checkUsername = 0;
 $checkEmail = 0;
@@ -18,6 +21,10 @@ $lang_array = ['ukrainian' => 'uk',
     'finnish' => 'fi', 'english' => 'en', 'english-british' => 'en', 'danish' => 'da', 'czech' => 'cs', 'chinese' => 'zh', 'bulgarian' => 'bz'];
 chdir('../');
 $base_dir = getcwd();
+
+echo evoMigrate::output();
+
+die();
 
 if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
 	
@@ -829,4 +836,42 @@ return [
         return $str;
     }
 
+}
+
+
+class evoMigrate
+{
+	static public function output () {
+		$output = "<table class='myTable'>";
+			$output .= "<thead>";
+				$output .= "<tr>";
+					$output .= "<th>";
+						$output .= "Stage";
+					$output .= "</th>";
+				$output .= "</tr>";
+			$output .= "</thead>";
+			$output .= "<tbody>";
+			/*
+				$output .= "<tr>";
+					$output .= "<td>";
+						$output .= "";
+					$output .= "</td>";
+				$output .= "</tr>";
+				*/
+			$output .= "</tbody>";
+		$output .= "</table>";
+		
+		$output .= '<script src="media/script/jquery/jquery.min.js" type="text/javascript"></script>';
+		
+		$output .= '<script type="text/javascript">
+		/*
+						var evoMigrate = jQuery.noConflict();
+						evoMigrate(document).ready(function ($) 
+						{
+						});
+		*/
+						$(".myTable tr:last").after("<tr><td>Test</td></tr>");
+					</script>';
+		return $output;
+	}
 }
