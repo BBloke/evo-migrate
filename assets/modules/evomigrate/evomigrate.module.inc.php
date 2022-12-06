@@ -61,44 +61,57 @@ if ( empty($_REQUEST['action']) ) {
 	echo "3. Complete the installation by running install/index.php to update to v3.<br />";
 	echo "4. Re-run this module to import the original user/group permissions.<br />";
 	
-	// We are going to create membergroup_names to match the webuser_names
-	echo "Moving webgroup_names to membergroup_names";
-	echo "<hr />";
-	$rsWebGroups = $modx->db->select("name", $modx->getFullTableName('webgroup_names'), "", "id DESC" );
-	while ( $row = $modx->db->getRow($rsWebGroups) ) {
-		echo "Checking for duplicate group: ".$row['name'];
-		
-		$rsGroupDuplicate = $modx->db->select( "name", $modx->getFullTableName('membergroup_names'), "name='".$row['name']."'", "id ASC");
-		if ( $modx->db->getRecordCount($rsGroupDuplicate) > 0 ) {
-			echo " <srtong>duplicate found!</strong><br />";
-		} else {
-			$modx->db->insert(array( "name" => $row['name']), $modx->getFullTableName('membergroup_names') );
+	echo "<br />Checking if Users/Permissions are present.<br/ >";
+	$rs = $modx->db->select("username", $modx->getFullTableName('web_users'), "", "id DESC" );
+	$userCount = $modx->db->getRecordCount($rs);
+	echo "Users found: ".$userCount."<br />";
+	$rs = $modx->db->select("name", $modx->getFullTableName('webgroup_names'), "", "id DESC" );
+	$nameCount = $modx->db->getRecordCount($rs);
+	echo "Permissions found: ".$nameCount."<br />";
+	
+	
+	if ( $nameCount > 0 && $userCount > 0 ) {
+		// We are going to create membergroup_names to match the webuser_names
+		echo "Moving webgroup_names to membergroup_names";
+		echo "<hr />";
+		$rsWebGroups = $modx->db->select("name", $modx->getFullTableName('webgroup_names'), "", "id DESC" );
+		while ( $row = $modx->db->getRow($rsWebGroups) ) {
+			echo "Checking for duplicate group: ".$row['name'];
+			
+			$rsGroupDuplicate = $modx->db->select( "name", $modx->getFullTableName('membergroup_names'), "name='".$row['name']."'", "id ASC");
+			if ( $modx->db->getRecordCount($rsGroupDuplicate) > 0 ) {
+				echo " <srtong>duplicate found!</strong><br />";
+			} else {
+				$modx->db->insert(array( "name" => $row['name']), $modx->getFullTableName('membergroup_names') );
+			}
+			echo "<br />";
 		}
-		echo "<br />";
-	}
-	
-	echo "Moving the old web_groups records to the new member_groups table";
-	echo "<hr />";
-	
-	
-	$rs = $modx->db->query('SHOW TABLES LIKE "%'.$tempWebGroupAccess.'%"');
-	$count = $modx->db->getRecordCount($rs);
-
-	// Content Database
-	if ( $count == 0 ) {
-		// We should move webgroup_access to a temp table so we can import it later after the migration.
-		$sql = 'CREATE TABLE '.$modx->getFullTableName($tempWebGroupAccess).' AS 
-				SELECT 
-					t3.id as webgroup,
-					documentgroup,
-					"1"
-				FROM '.$modx->getFullTableName('webgroup_access').' t1
-				INNER JOIN '.$modx->getFullTableName('webgroup_names').' t2 ON t1.webgroup = t2.id
-				INNER JOIN '.$modx->getFullTableName('membergroup_names').' t3 ON t2.name = t3.name;';
 		
-		$rs = $modx->db->query($sql);
-		echo "Created temporary webgroup_access table for migration after the installation of v3";
-	}	
+		echo "Moving the old web_groups records to the new member_groups table";
+		echo "<hr />";
+		
+		
+		$rs = $modx->db->query('SHOW TABLES LIKE "%'.$tempWebGroupAccess.'%"');
+		$count = $modx->db->getRecordCount($rs);
+
+		// Content Database
+		if ( $count == 0 ) {
+			// We should move webgroup_access to a temp table so we can import it later after the migration.
+			$sql = 'CREATE TABLE '.$modx->getFullTableName($tempWebGroupAccess).' AS 
+					SELECT 
+						t3.id as webgroup,
+						documentgroup,
+						"1"
+					FROM '.$modx->getFullTableName('webgroup_access').' t1
+					INNER JOIN '.$modx->getFullTableName('webgroup_names').' t2 ON t1.webgroup = t2.id
+					INNER JOIN '.$modx->getFullTableName('membergroup_names').' t3 ON t2.name = t3.name;';
+			
+			$rs = $modx->db->query($sql);
+			echo "Created temporary webgroup_access table for migration after the installation of v3";
+		}
+	} else {
+		echo "<strong>No Users or Permissions found.  Temporary table not needed.</strong>";
+	}
 	
 	die();
 }
@@ -154,7 +167,7 @@ if ($checkUsername > 0 || $checkEmail > 0) {
 		echo '</tbody></table>';
     }
 	
-    if ($checkEmail > 0) {    
+    if ( $checkEmail > 0 ) {    
         echo '<table border="1"> <thead><th>Manager Id</th><th>Manager email</th><th>Web User Id</th><th>Web user email</th></thead><tbody></tbody>';
 		
 		$sql = "SELECT t1.internalKey as userid, t1.email as email, t2.internalKey as webid, t2.email as webemail 
@@ -280,7 +293,7 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	echo "Moving the old webgroup_access records to the new membergroup_access table";
 	echo "<hr />";
 	
-	$sql = "INSERT INTO ".$modx->getFullTableName('member_groups')." (membergroup, documentgroup)
+	$sql = "INSERT INTO ".$modx->getFullTableName('membergroup_access')." (membergroup, documentgroup)
 			SELECT 
 				t3.id as  membergroup,
 				t1.documentgroup as documentgroup
@@ -295,7 +308,7 @@ while ( $user = $modx->db->getRow($rsUsers) ) {
 	
 	echo "deleting the old manager user<br />";
 	$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
-	$modx->db->delete($modx->getFullTableName('user_settings'), "member=".$oldId);
+	$modx->db->delete($modx->getFullTableName('user_settings'), "user=".$oldId);
 	$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
 }
 
