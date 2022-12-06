@@ -2,6 +2,8 @@
 EvolutionCMS module for migrating v1.4, v2 to v3.x
 Works with PHP 7 and PHP 8
 
+NB: v2 code is not PHP8 compatible.  This script has only been tested for v2 in PHP7.4
+
 The program does the following:
 
 1. Creates new manager group names from web group names
@@ -17,11 +19,6 @@ The program does the following:
 11. Creates config file
 12. Downloads the new v3 program from evolution/evolution-community
 13. Run /install to finalise the migration.
-
-# To-Do:
-Test migration of a website that does NOT have users/permissions.
-
-At the moment the script will fail if there are no users/permissions setup.  I'm hoping to deal with this eventuality soon.
 
 # Issues:
 Plugins can prevent you from accessing your site after the migration.  This may be due to the plugins code trying to use the old web user tables.
