@@ -8,9 +8,6 @@ $checkEmail = 0;
 
 $_REQUEST['action'] ??= '';
 
-$action_id = isset($_GET['a']) 		? intval($_GET['a']) 	: 0;
-$module_id = isset($_GET['id']) 	? intval($_GET['id']) 	: 0;
-
 $tempWebGroupAccess = 'tempwebgroup_access';
 
 $lang_array = ['ukrainian' => 'uk',
