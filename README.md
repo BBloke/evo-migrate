@@ -2,10 +2,13 @@
 EvolutionCMS module for migrating v1.4, v2 to v3.x
 Works with PHP 7 and PHP 8
 
-NB: v2 code is not PHP8 compatible.  This script has only been tested for v2 in PHP7.4
+Tested on v1.4.12 PHP8.0 with users and permissions.
+Tested on v2.0.4 PHP7.4 with users and permissions.
+	This was v1.4.12 upgraded to v2.0.4.
 
-I have refactored the old code to make each process a clickable step utilising AJAX.  Below is the original readme which covers the program.
-This will be changed to reflect the new way the programs is used.  Hopefully it will help.
+NB: v2 code is not PHP8 compatible.  This script has only been tested for v2 with PHP7.4
+
+I have refactored the old code to make each process a clickable step utilising AJAX.
 
 The program does the following:
 
@@ -27,19 +30,20 @@ The program does the following:
 
 Install and run the module.
 
-The program initially creates the necessary user groups for transfer from Manager to Users.  It also creates a temporary access table for later insertion after the migration process.
-
 The program breaks each section down to clickable buttons.
 
 1. Check Users and Emails for duplications.
 2. Install new tables
 3. Create new System Events
 4. Migrate Users
-5. Download and extract latest v3 code.
+5. Download and extract latest v3 code
 
-Each button will run via ajax and return results to the screen.
+Each button will run a process via ajax and return results to the screen.
+Each button turns red once clicked
 
-Once the new code has downloaded and extracted you will be prompted to click a link to run the install process.
+* WAIT UNTIL A RESULT HAS BEEN RETURNED BEFORE CLICKING THE NEXT BUTTON *
+
+Once v3 has downloaded and extracted you will be prompted to click a link to run the install process.
 
 After the install process has run.  Log in to the Manager and re-run the migration tool.
 
@@ -48,7 +52,6 @@ The last process is to import the temporary access table.
 ## Considerations
 
 You can click the buttons mulitple times and click them out of order.  BE CAREFUL.
-
 Only click them in order and wait until you see the result on the screen.
 
 # Issues:
@@ -75,10 +78,9 @@ You will also need to change any FormLister call for user login, regristration e
 
 You will also need to add Pathologic's composer package to core/custom/composer.json (this may be included with the latest version of EvolutionCMS).
 
-** Exmaple
+** Example
 ```
 {
-
 	"require": {
 		"pathologic/modxapi": "*"
 	}
