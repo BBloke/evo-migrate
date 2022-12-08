@@ -1,8 +1,11 @@
-# evo-migrate v1.0.9 
+# evo-migrate v2
 EvolutionCMS module for migrating v1.4, v2 to v3.x
 Works with PHP 7 and PHP 8
 
 NB: v2 code is not PHP8 compatible.  This script has only been tested for v2 in PHP7.4
+
+I have refactored the old code to make each process a clickable step utilising AJAX.  Below is the original readme which covers the program.
+This will be changed to reflect the new way the programs is used.  Hopefully it will help.
 
 The program does the following:
 
