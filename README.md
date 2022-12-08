@@ -23,6 +23,34 @@ The program does the following:
 12. Downloads the new v3 program from evolution/evolution-community
 13. Run /install to finalise the migration.
 
+# How to Use
+
+Install and run the module.
+
+The program initially creates the necessary user groups for transfer from Manager to Users.  It also creates a temporary access table for later insertion after the migration process.
+
+The program breaks each section down to clickable buttons.
+
+1. Check Users and Emails for duplications.
+2. Install new tables
+3. Create new System Events
+4. Migrate Users
+5. Download and extract latest v3 code.
+
+Each button will run via ajax and return results to the screen.
+
+Once the new code has downloaded and extracted you will be prompted to click a link to run the install process.
+
+After the install process has run.  Log in to the Manager and re-run the migration tool.
+
+The last process is to import the temporary access table.
+
+## Considerations
+
+You can click the buttons mulitple times and click them out of order.  BE CAREFUL.
+
+Only click them in order and wait until you see the result on the screen.
+
 # Issues:
 Plugins can prevent you from accessing your site after the migration.  This may be due to the plugins code trying to use the old web user tables.
 The best approach I have found is to disable all the plugins prior to migrating.  Re-enabling them one by one and test the site after migration.
@@ -45,7 +73,7 @@ You will also need to change any FormLister call for user login, regristration e
 &model=`Pathologic\EvolutionCMS\MODxAPI\modUsers`
 ```
 
-You will also need to add Pathologic's composer package to core/custom/composer.json
+You will also need to add Pathologic's composer package to core/custom/composer.json (this may be included with the latest version of EvolutionCMS).
 
 ** Exmaple
 ```

@@ -8,6 +8,10 @@ class evoMigrate
 		$output = '';
 		$tempWebGroupAccess = 'tempwebgroup_access';
 		
+		$_REQUEST['action'] ??= '';
+		$action_id = isset($_GET['a']) 		? intval($_GET['a']) 	: 0;
+		$module_id = isset($_GET['id']) 	? intval($_GET['id']) 	: 0;
+		
 		if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
 			if ( $_REQUEST['action'] == 'Import' ) {
 				// Append records from temp table to actual table.
@@ -38,9 +42,9 @@ class evoMigrate
 		$output = "<table class='myTable'>";
 			$output .= "<thead>";
 				$output .= "<tr>";
-					$output .= "<th>Function</th>";
-					$output .= "<th>Action</th>";
-					$output .= "<th>Result</th>";
+					$output .= "<th width='45%'>Function</th>";
+					$output .= "<th width='10%'>Action</th>";
+					$output .= "<th width='45%'>Result</th>";
 				$output .= "</tr>";
 			$output .= "</thead>";
 			$output .= "<tbody>";
@@ -66,13 +70,13 @@ class evoMigrate
 				$output .= "<tr>";
 					$output .= "<td>Migrate Users</td>";
 					$output .= "<td><input id='migrateUsers' type='submit' name='migrateUsers' value='Migrate Users' /></td>";
-					$output .= "<td><div id='migrateUSersResult'></div></td>";
+					$output .= "<td><div id='migrateUsersResult' style='overflow:scroll;height: 100px;'></div></td>";
 				$output .= "</tr>";
 				
 				$output .= "<tr>";
 					$output .= "<td>Download and install v3</td>";
 					$output .= "<td><input id='installv3' type='submit' name='installv3' value='Install v3' /></td>";
-					$output .= "<td><div id='installv3'></div></td>";
+					$output .= "<td><div id='installv3Result'></div></td>";
 				$output .= "</tr>";
 				
 			$output .= "</tbody>";
@@ -189,44 +193,7 @@ class evoMigrate
 			$output .=  "Permissions found: ".$nameCount."<br />";
 			
 			
-			// We are going to create membergroup_names to match the webuser_names
-			$output .=  "Moving webgroup_names to membergroup_names";
-			$output .=  "<hr />";
-			$rsWebGroups = $modx->db->select("name", $modx->getFullTableName('webgroup_names'), "", "id DESC" );
-			while ( $row = $modx->db->getRow($rsWebGroups) ) {
-				$output .=  "Checking for duplicate group: ".$row['name'];
-				
-				$rsGroupDuplicate = $modx->db->select( "name", $modx->getFullTableName('membergroup_names'), "name='".$row['name']."'", "id ASC");
-				if ( $modx->db->getRecordCount($rsGroupDuplicate) > 0 ) {
-					$output .=  " <strong>duplicate found!</strong><br />";
-				} else {
-					$modx->db->insert(array( "name" => $row['name']), $modx->getFullTableName('membergroup_names') );
-				}
-				$output .=  "<br />";
-			}
 			
-			$output .=  "Moving the old web_groups records to the new member_groups table";
-			$output .=  "<hr />";
-			
-			
-			$rs = $modx->db->query('SHOW TABLES LIKE "%'.$tempWebGroupAccess.'%"');
-			$count = $modx->db->getRecordCount($rs);
-
-			// Content Database
-			if ( $count == 0 ) {
-				// We should move webgroup_access to a temp table so we can import it later after the migration.
-				$sql = 'CREATE TABLE '.$modx->getFullTableName($tempWebGroupAccess).' AS 
-						SELECT 
-							t3.id as webgroup,
-							documentgroup,
-							"1"
-						FROM '.$modx->getFullTableName('webgroup_access').' t1
-						INNER JOIN '.$modx->getFullTableName('webgroup_names').' t2 ON t1.webgroup = t2.id
-						INNER JOIN '.$modx->getFullTableName('membergroup_names').' t3 ON t2.name = t3.name;';
-				
-				$rs = $modx->db->query($sql);
-				$output .=  "Created temporary webgroup_access table for migration after the installation of v3";
-			}
 		} else {
 			$output .=  "<strong>No Users or Permissions found.  Temporary table not needed.</strong>";
 		}
@@ -306,7 +273,7 @@ class evoMigrate
 	static public function installTables () {
 		$modx = EvolutionCMS();
 		
-		$output = ''.time();
+		$output = '';
 		
 		// MIGRATION INSTALL //
 		$rs = $modx->db->query("SHOW TABLES LIKE '".$modx->db->config['table_prefix']."migrations_install';");
@@ -648,8 +615,49 @@ class evoMigrate
 		$modx = EvolutionCMS();
 		
 		$output = '';
-		
+		$tempWebGroupAccess = 'tempwebgroup_access';
 		$base_dir = $modx->config['base_path'];
+		
+		//
+		
+		// We are going to create membergroup_names to match the webuser_names
+		$output .=  "Moving webgroup_names to membergroup_names";
+		$output .=  "<hr />";
+		$rsWebGroups = $modx->db->select("name", $modx->getFullTableName('webgroup_names'), "", "id DESC" );
+		while ( $row = $modx->db->getRow($rsWebGroups) ) {
+			$output .=  "Checking for duplicate group: ".$row['name'];
+			
+			$rsGroupDuplicate = $modx->db->select( "name", $modx->getFullTableName('membergroup_names'), "name='".$row['name']."'", "id ASC");
+			if ( $modx->db->getRecordCount($rsGroupDuplicate) > 0 ) {
+				$output .=  " <strong>duplicate found!</strong><br />";
+			} else {
+				$modx->db->insert(array( "name" => $row['name']), $modx->getFullTableName('membergroup_names') );
+			}
+			$output .=  "<br />";
+		}
+		
+		$output .=  "Moving the old web_groups records to the new member_groups table";
+		$output .=  "<hr />";
+		
+		
+		$rs = $modx->db->query('SHOW TABLES LIKE "%'.$tempWebGroupAccess.'%"');
+		$count = $modx->db->getRecordCount($rs);
+
+		// Content Database
+		if ( $count == 0 ) {
+			// We should move webgroup_access to a temp table so we can import it later after the migration.
+			$sql = 'CREATE TABLE '.$modx->getFullTableName($tempWebGroupAccess).' AS 
+					SELECT 
+						t3.id as webgroup,
+						documentgroup,
+						"1"
+					FROM '.$modx->getFullTableName('webgroup_access').' t1
+					INNER JOIN '.$modx->getFullTableName('webgroup_names').' t2 ON t1.webgroup = t2.id
+					INNER JOIN '.$modx->getFullTableName('membergroup_names').' t3 ON t2.name = t3.name;';
+			
+			$rs = $modx->db->query($sql);
+			$output .=  "Created temporary webgroup_access table for migration after the installation of v3";
+		}
 		
 		// MIGRATING MANAGERS TO USERS //
 
@@ -665,7 +673,7 @@ class evoMigrate
 			$output .=  $user['id']."<br />";
 			$oldId = $user['id'];
 			
-			// User attributes
+			// MAnager attributes
 			$rsUser = $modx->db->select( "*", $modx->getFullTableName('user_attributes'), "id=".$oldId );
 			$userAttributes = $modx->db->getRow($rsUser);
 			unset($userAttributes['id']); // We don't need this but we do need to create it for the newly inserted user record
@@ -676,6 +684,8 @@ class evoMigrate
 				unset($row['user']); // remove the user id
 				$userSettings[] = $row;
 			}
+			
+			//print_r($userSettings);
 			
 			$output .=  "<hr />";
 			
@@ -736,6 +746,12 @@ class evoMigrate
 				}
 			}
 			
+			$output .=  "deleting the old manager user<br />";
+			$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
+			$modx->db->delete($modx->getFullTableName('user_settings'), "user=".$oldId);
+			$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
+		}
+		
 			$output .=  "Moving the old web_groups records to the new member_groups table";
 			$output .=  "<hr />";
 			
@@ -765,19 +781,14 @@ class evoMigrate
 			
 			$output .=  "Moved old webgroup_access records to the new membergroup_access table";
 			$output .=  "<hr />";
-			
-			
-			$output .=  "deleting the old manager user<br />";
-			$modx->db->delete($modx->getFullTableName('user_attributes'), "internalKey=".$oldId);
-			$modx->db->delete($modx->getFullTableName('user_settings'), "user=".$oldId);
-			$modx->db->delete($modx->getFullTableName('member_groups'), "member=".$oldId);
-		}
-
+		
 		return $output;
 	}
 	
 	static public function installv3 () {
 		$modx = EvolutionCMS();
+		
+		$output = '';
 		
 		// Install new system files //
 		$base_dir = $modx->config['base_path'];
@@ -793,7 +804,7 @@ class evoMigrate
 		$config = EvoInstaller::checkConfig($base_dir, $config_2_dir, $database_engine, $modx->db->config);
 
 		//run unzip and install
-		EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', 'evo.zip');
+		EvoInstaller::downloadFile('https://github.com/evocms-community/evolution/archive/refs/heads/3.x.zip', $base_dir.'evo.zip');
 
 		$zip = new ZipArchive;
 		$res = $zip->open($base_dir . '/evo.zip');
@@ -832,6 +843,8 @@ class evoMigrate
 
 		$output .=  "<hr />Please ensure you run the install program as normal. <a target='_new' href='".$modx->getConfig("site_url")."install'>Complete installation</a><hr />";
 		// END INSTALL NEW SYSTEM FILES //
+		
+		return $output;
 	}
 }
 
@@ -883,10 +896,12 @@ class EvoInstaller
     }
 
     static public function checkVersion($base_dir) {
+		$output = '';
         if (file_exists($base_dir . '/core/factory/version.php')) {
             $data = include $base_dir . '/core/factory/version.php';
             if (version_compare($data['version'], '2.0.4', '<')) {
                 $output .=  'Please update to version 2.0.4 before start this script';
+				return $output;
                 exit();
             } else {
                 return;
@@ -897,14 +912,16 @@ class EvoInstaller
             include $base_dir . '/manager/includes/version.inc.php';
             if (version_compare($modx_version, '1.4.12', '<')) {
                 $output .=  'Please update to version 1.4.12 before start this script';
+				return $output;
                 exit();
             }
         }
     }
 
     static public function checkConfig($base_dir, $config_2_dir, $database_engine, $parameters) {
+		$output = '';
 	
-	if ($parameters['host'] == '127.0.0.1') $parameters['host'] = 'localhost';
+		if ($parameters['host'] == '127.0.0.1') $parameters['host'] = 'localhost';
         if (file_exists($config_2_dir)) {
             return '';
         }
@@ -964,7 +981,7 @@ return [
     ]
 ];";
         $str = str_replace(array_keys($arr_config), array_values($arr_config), $str);
-
+		
         return $str;
     }
 }
