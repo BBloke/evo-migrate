@@ -4,7 +4,7 @@
  * Migration Module for Evolution CMS
  * @author    Chris Hunton
  * @category    plugin
- * @version    1.0.8
+ * @version    2.0.1
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @internal    @installset base
  * @internal    @modx_category Module
