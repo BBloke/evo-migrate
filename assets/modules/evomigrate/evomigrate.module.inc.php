@@ -3,7 +3,7 @@ $count = 0;
 $checkUsername = 0;
 $checkEmail = 0;
 
-$_REQUEST['action'] ??= '';
+$_REQUEST['action'] ?? '';
 
 $action_id = isset($_GET['a']) 		? intval($_GET['a']) 	: 0;
 $module_id = isset($_GET['id']) 	? intval($_GET['id']) 	: 0;
