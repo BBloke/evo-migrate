@@ -1,4 +1,4 @@
-# evo-migrate v1.0.9 
+# evo-migrate v1.0.11
 EvolutionCMS module for migrating v1.4, v2 to v3.x
 Works with PHP 7 and PHP 8
 
