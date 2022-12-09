@@ -179,10 +179,9 @@ class evoMigrate
 			$output .=  "This program will attempt to migrate you webusers and groups to v3<br />";
 			
 			$output .=  "The below output is a precursor to the migration.<br />";
-			$output .=  "1. Run this module - it will automatically create some necessary details. <br/>";
-			$output .=  "2. Click 'Run' when available - NB: Only click it once.  IT will do what is needed without the screen updating.<br />";
-			$output .=  "3. Complete the installation by running install/index.php to update to v3.<br />";
-			$output .=  "4. Re-run this module to import the original user/group permissions.<br />";
+			$output .=  "1. Click each button ONE AT A TIME.<br/>";
+			$output .=  "2. A button will turn RED when that stage is complete.<br />";
+			$output .=  "3. Re-run this module to import the original user/group permissions.<br />";
 			
 			$output .=  "<br />Checking if Users/Permissions are present.<br/ >";
 			$rs = $modx->db->select("username", $modx->getFullTableName('web_users'), "", "id DESC" );
