@@ -701,6 +701,10 @@ class evoMigrate
 				);
 			$newId = $modx->db->insert($newUser, $modx->getFullTableName('web_users'));	
 			
+			$modx->db->query("UPDATE {$modx->getFullTableName('site_content')} SET `createdby`={$newId} WHERE `createdby`={$oldId}");
+			$modx->db->query("UPDATE {$modx->getFullTableName('site_content')} SET `editedby`={$newId} WHERE `editedby`={$oldId}");
+			$modx->db->query("UPDATE {$modx->getFullTableName('site_content')} SET `deletedby`={$newId} WHERE `deletedby`={$oldId}");
+			
 			file_put_contents($base_dir.'/assets/cache/users.txt', $oldId.'||'.$newId."\n", FILE_APPEND);
 			
 			$output .=  "Migrating User Attributes<br />";
