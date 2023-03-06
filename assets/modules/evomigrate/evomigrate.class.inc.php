@@ -226,10 +226,16 @@ class evoMigrate
 			$rs = $modx->db->select("username", $modx->getFullTableName('web_users'), "username='".$username."'" );
 			$checkUsername = $checkUsername + $modx->db->getRecordCount($rs);
 		}
-		
+
+        // Check all the users against the manager users for duplicate email
+        foreach ( $emails as $email ) {
+            $rsEml = $modx->db->select("email", $modx->getFullTableName('web_user_attributes'), "email='".$email."'" );
+            $checkEmail = $checkEmail + $modx->db->getRecordCount($rsEml);
+        }
 		// Output results
 		// If there are duplicates EXIT
 		if ($checkUsername > 0 || $checkEmail > 0) {
+            $output = '<b>some conflicts are found</b><br/>';
 			if ( $checkUsername > 0 ) {
 				$output .=  'some manager conflict with web user - It is a good idea to change the WEB USER name only';
 				$output .=  '<table border="1"><thead><th>Manager Id</th><th>Manager username</th><th>Web User Id</th><th>Web user username</th></thead><tbody></tbody>';
@@ -247,7 +253,8 @@ class evoMigrate
 				$output .=  '</tbody></table>';
 			}
 			
-			if ( $checkEmail > 0 ) {    
+			if ( $checkEmail > 0 ) {
+                $output .=  'some manager conflict with web user - It is a good idea to change  user email';
 				$output .=  '<table border="1"> <thead><th>Manager Id</th><th>Manager email</th><th>Web User Id</th><th>Web user email</th></thead><tbody></tbody>';
 				
 				$sql = "SELECT t1.internalKey as userid, t1.email as email, t2.internalKey as webid, t2.email as webemail 
@@ -262,7 +269,7 @@ class evoMigrate
 				}
 				$output .=  '</tbody></table>';
 			}
-			exit();
+			exit($output);
 		}
 		
 		return $output;
@@ -700,10 +707,6 @@ class evoMigrate
 					"username" => $user['username']
 				);
 			$newId = $modx->db->insert($newUser, $modx->getFullTableName('web_users'));	
-			
-			$modx->db->query("UPDATE {$modx->getFullTableName('site_content')} SET `createdby`={$newId} WHERE `createdby`={$oldId}");
-			$modx->db->query("UPDATE {$modx->getFullTableName('site_content')} SET `editedby`={$newId} WHERE `editedby`={$oldId}");
-			$modx->db->query("UPDATE {$modx->getFullTableName('site_content')} SET `deletedby`={$newId} WHERE `deletedby`={$oldId}");
 			
 			file_put_contents($base_dir.'/assets/cache/users.txt', $oldId.'||'.$newId."\n", FILE_APPEND);
 			
