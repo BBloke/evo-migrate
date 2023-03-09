@@ -37,6 +37,8 @@ include_once $modx->getConfig('base_path') . 'assets/modules/evomigrate/evomigra
 //$config = array();
 //$evoMigrate = new evoMigrate( $config );
 
+if ( $_REQUEST['action'] == "deactivatePlugins" ) echo evoMigrate::deactivatePlugins();
+if ( $_REQUEST['action'] == "activatePlugins" ) echo evoMigrate::activatePlugins();
 if ( $_REQUEST['action'] == "checkUsers" ) echo evoMigrate::checkUsers();
 if ( $_REQUEST['action'] == 'installTables' ) echo evoMigrate::installTables();
 if ( $_REQUEST['action'] == 'systemEvents' ) echo evoMigrate::systemEvents();
