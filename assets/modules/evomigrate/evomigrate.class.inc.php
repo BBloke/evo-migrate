@@ -12,6 +12,7 @@ class evoMigrate
 		$action_id = isset($_GET['a']) 		? intval($_GET['a']) 	: 0;
 		$module_id = isset($_GET['id']) 	? intval($_GET['id']) 	: 0;
 		
+		// We have updated to 3
 		if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
 			if ( $_REQUEST['action'] == 'Import' ) {
 				// Append records from temp table to actual table.
@@ -48,6 +49,11 @@ class evoMigrate
 				$output .= "</tr>";
 			$output .= "</thead>";
 			$output .= "<tbody>";
+				$output .= "<tr>";
+					$output .= "<td>Disable active Plugins?</td>";
+					$output .= "<td><input id='deactivatePlugins' type='submit' name='deactivatePlugins' value='Deactivate Plugins' /></td>";
+					$output .= "<td><div id='deactivatePluginsResult'></div></td>";
+				$output .= "</tr>";
 				$output .= "<tr>";
 					$output .= "<td>Check Users and Email Address for Duplicate</td>";
 					$output .= "<td><input id='checkUsers' type='submit' name='checkUsers' value='Check Users' /></td>";
@@ -86,6 +92,40 @@ class evoMigrate
 		$output .= '<script type="text/javascript">
 						var url =  "../assets/modules/evomigrate/ajax/evomigrate.ajax.inc.php";
 
+						$("#deactivatePlugins").click(function () {
+							$.ajax({
+								url			: url,
+								type		: "POST",
+								cache		: false,
+								data		: {
+									"action" 		: "deactivatePlugins"
+								},
+								success		: function( html ) {
+									$("#deactivatePluginsResult").append(html);
+									$("#deactivatePlugins").css( "background-color", "red" );
+								}	// End if success function
+							});
+							
+							return false;
+						});
+						
+						$("#activatePlugins").click(function () {
+							$.ajax({
+								url			: url,
+								type		: "POST",
+								cache		: false,
+								data		: {
+									"action" 		: "activatePlugins"
+								},
+								success		: function( html ) {
+									$("#checkUsersResult").append(html);
+									$("#checkUsers").css( "background-color", "red" );
+								}	// End if success function
+							});
+							
+							return false;
+						});
+						
 						$("#checkUsers").click(function () {
 							$.ajax({
 								url			: url,
@@ -275,7 +315,41 @@ class evoMigrate
 		return $output;
 		
 	}
-
+	
+	static public function deactivatePlugins() {
+		// Get a list of disabled plugins
+		$modx = EvolutionCMS();
+		$data = '';
+		$base_dir = $modx->config['base_path'];
+		$results = $modx->db->select("id", $modx->db->config['table_prefix']."site_plugins", 'disabled=0');
+		while ( $row = $modx->db->getRow($results) ) {
+			//echo $row['id'];
+			$data .= $row['id'].',';
+			
+		}
+		$data = rtrim($data, ',');
+		
+		$sql = "UPDATE ". $modx->db->config['table_prefix']."site_plugins" ." SET disabled=1 WHERE id IN ( ".$data." );";
+		$modx->db->query($sql);
+		
+		// Write it out to an SQL Statement and store in a file.
+		file_put_contents($base_dir.'/assets/cache/plugins.txt', $data);
+		
+		return $data;
+	}
+	
+	static public function activatePlugins() {
+		$modx = EvolutionCMS();
+		$base_dir = $modx->config['base_path'];
+		$data = file_get_contents($base_dir.'/assets/cache/plugins.txt', $data);
+		
+		$sql = "UPDATE ". $modx->db->config['table_prefix']."site_plugins" ." SET disabled=0 WHERE id IN ( ".$data." )";
+		echo $sql;
+		$modx->db->query($sql);
+		
+		return $data;
+	}
+	
 	static public function installTables () {
 		$modx = EvolutionCMS();
 		
