@@ -24,14 +24,19 @@ class evoMigrate
 				$sql = "DROP TABLE ".$modx->getFullTableName($tempWebGroupAccess).";";
 				$modx->db->query($sql);
 				$output .=  "Removed temporary table.<br />";
-				
+				$output .=  "<form>";
+					$output .=  "<input type='submit' name='action' value='Reactivate Plugins' class='btn'>";
+				$output .=  "</form>";
+			} elseif ( $_REQUEST['action'] == 'Reactivate Plugins' ) {
+				$output .= "Reactivating Plugins<br />";
+				evoMigrate::activatePlugins();
 			} else {
 				$output .=  "Do you want to import the old webgroup_access table in the current usergroup_access table.<br />";
 				$output .=  "<form>";
 				//$output .=  "<a href='#&action=run' title='run' class='btn'>Run</a>";
 				$output .=  '<input type="hidden" name="a" value="'.$action_id.'"/>';
 				$output .=  '<input type="hidden" name="id" value="'.$module_id.'"/>';
-				$output .=  "<input type='submit' name='action' value='Import' class='btn'>";
+				$output .=  "<input type='submit' name='action' value='Import' class='btn'><br />";
 				$output .=  "</form>";
 			}
 			return $output;
@@ -344,7 +349,7 @@ class evoMigrate
 		$data = file_get_contents($base_dir.'/assets/cache/plugins.txt', $data);
 		
 		$sql = "UPDATE ". $modx->db->config['table_prefix']."site_plugins" ." SET disabled=0 WHERE id IN ( ".$data." )";
-		echo $sql;
+		
 		$modx->db->query($sql);
 		
 		return $data;
