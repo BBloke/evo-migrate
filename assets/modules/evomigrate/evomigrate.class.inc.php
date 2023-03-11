@@ -37,6 +37,7 @@ class evoMigrate
 				$output .=  '<input type="hidden" name="a" value="'.$action_id.'"/>';
 				$output .=  '<input type="hidden" name="id" value="'.$module_id.'"/>';
 				$output .=  "<input type='submit' name='action' value='Import' class='btn'><br />";
+				$output .=  "<input type='submit' name='action' value='Reactivate Plugins' class='btn'>";
 				$output .=  "</form>";
 			}
 			return $output;
@@ -344,14 +345,32 @@ class evoMigrate
 	}
 	
 	static public function activatePlugins() {
+		// TODO: Check each plugin for a duplicate and delete the loet plugin ID
 		$modx = EvolutionCMS();
 		$base_dir = $modx->config['base_path'];
 		$data = file_get_contents($base_dir.'/assets/cache/plugins.txt', $data);
 		
+		// change to an array
+		$pluginIDs = explode(",", $data);
+		
+		foreach ( $pluginIDs as $id ) {
+			// get the plugin details
+			$sql = "SELECT name FROM ".$modx->db->config['table_prefix']."site_plugins" ." WHERE id = ".$id.";";
+			$rs = $modx->db->query($sql);
+			$row = $modx->db->getRow($rs);
+			
+			$sql = "SELECT id FROM ".$modx->db->config['table_prefix']."site_plugins" ." WHERE name = '".$row['name']."';";
+			$rs = $modx->db->query($sql);
+			$count = $modx->db->getRecordCount($rs);
+			
+			if ( $count > 1 ) {
+				// Delete the lowest plugin ID number that has the same name.
+				$deleteSQL = "DELETE FROM ".$modx->db->config['table_prefix']."site_plugins" ." WHERE name='".$row['name']."' AND id = ".$id." ORDER BY id ASC LIMIT 1;";
+				$delete = $modx->db->query($deleteSQL);
+			}
+		}
 		$sql = "UPDATE ". $modx->db->config['table_prefix']."site_plugins" ." SET disabled=0 WHERE id IN ( ".$data." )";
-		
 		$modx->db->query($sql);
-		
 		return $data;
 	}
 	
