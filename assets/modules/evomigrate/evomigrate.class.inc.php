@@ -14,20 +14,7 @@ class evoMigrate
 		
 		// We have updated to 3
 		if ( substr($modx->getConfig('settings_version'),0,1) > 2 ) {
-			if ( $_REQUEST['action'] == 'Import' ) {
-				// Append records from temp table to actual table.
-				$sql = "INSERT INTO ".$modx->getFullTableName('membergroup_access')." (membergroup, documentgroup, context)  
-						SELECT webgroup, documentgroup, '1' FROM ".$modx->getFullTableName($tempWebGroupAccess).";";
-				$modx->db->query($sql);
-				$output .=  "Imported old webgroup_access table. <br />";
-				
-				$sql = "DROP TABLE ".$modx->getFullTableName($tempWebGroupAccess).";";
-				$modx->db->query($sql);
-				$output .=  "Removed temporary table.<br />";
-				$output .=  "<form>";
-					$output .=  "<input type='submit' name='action' value='Reactivate Plugins' class='btn'>";
-				$output .=  "</form>";
-			} elseif ( $_REQUEST['action'] == 'Reactivate Plugins' ) {
+			if ( $_REQUEST['action'] == 'Reactivate Plugins' ) {
 				$output .= "Reactivating Plugins<br />";
 				evoMigrate::activatePlugins();
 			} else {
@@ -36,7 +23,6 @@ class evoMigrate
 				//$output .=  "<a href='#&action=run' title='run' class='btn'>Run</a>";
 				$output .=  '<input type="hidden" name="a" value="'.$action_id.'"/>';
 				$output .=  '<input type="hidden" name="id" value="'.$module_id.'"/>';
-				$output .=  "<input type='submit' name='action' value='Import' class='btn'><br />";
 				$output .=  "<input type='submit' name='action' value='Reactivate Plugins' class='btn'>";
 				$output .=  "</form>";
 			}
@@ -345,32 +331,14 @@ class evoMigrate
 	}
 	
 	static public function activatePlugins() {
-		// TODO: Check each plugin for a duplicate and delete the loet plugin ID
 		$modx = EvolutionCMS();
 		$base_dir = $modx->config['base_path'];
 		$data = file_get_contents($base_dir.'/assets/cache/plugins.txt', $data);
 		
-		// change to an array
-		$pluginIDs = explode(",", $data);
-		
-		foreach ( $pluginIDs as $id ) {
-			// get the plugin details
-			$sql = "SELECT name FROM ".$modx->db->config['table_prefix']."site_plugins" ." WHERE id = ".$id.";";
-			$rs = $modx->db->query($sql);
-			$row = $modx->db->getRow($rs);
-			
-			$sql = "SELECT id FROM ".$modx->db->config['table_prefix']."site_plugins" ." WHERE name = '".$row['name']."';";
-			$rs = $modx->db->query($sql);
-			$count = $modx->db->getRecordCount($rs);
-			
-			if ( $count > 1 ) {
-				// Delete the lowest plugin ID number that has the same name.
-				$deleteSQL = "DELETE FROM ".$modx->db->config['table_prefix']."site_plugins" ." WHERE name='".$row['name']."' AND id = ".$id." ORDER BY id ASC LIMIT 1;";
-				$delete = $modx->db->query($deleteSQL);
-			}
-		}
 		$sql = "UPDATE ". $modx->db->config['table_prefix']."site_plugins" ." SET disabled=0 WHERE id IN ( ".$data." )";
+		
 		$modx->db->query($sql);
+		
 		return $data;
 	}
 	
@@ -722,7 +690,7 @@ class evoMigrate
 		$tempWebGroupAccess = 'tempwebgroup_access';
 		$base_dir = $modx->config['base_path'];
 		
-		//
+		/*
 		
 		// We are going to create membergroup_names to match the webuser_names
 		$output .=  "Moving webgroup_names to membergroup_names";
@@ -757,11 +725,12 @@ class evoMigrate
 						"1"
 					FROM '.$modx->getFullTableName('webgroup_access').' t1
 					INNER JOIN '.$modx->getFullTableName('webgroup_names').' t2 ON t1.webgroup = t2.id
-					INNER JOIN '.$modx->getFullTableName('membergroup_names').' t3 ON t2.name = t3.name;';
+					INNER JOIN '.$modx->getFullTableName('membergroup_names').' t3 ON t3.name = t2.name;';
 			
 			$rs = $modx->db->query($sql);
 			$output .=  "Created temporary webgroup_access table for migration after the installation of v3";
 		}
+		*/
 		
 		// MIGRATING MANAGERS TO USERS //
 
