@@ -25,6 +25,10 @@ class evoMigrate
 				$output .=  '<input type="hidden" name="id" value="'.$module_id.'"/>';
 				$output .=  "<input type='submit' name='action' value='Reactivate Plugins' class='btn'>";
 				$output .=  "</form>";
+				$output .= "Converting Permissions to WEB from MGR.<br />";
+				
+				$fields = array( 'context' => 1 );
+				$modx->db->update($fields, $modx->getFullTableName('membergroup_access'), "context=0" );
 			}
 			return $output;
 			
